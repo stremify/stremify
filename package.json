@@ -8,5 +8,10 @@
   },
   "devDependencies": {
     "nitropack": "latest"
+  },
+  "dependencies": {
+    "@movie-web/providers": "^2.2.2",
+    "dotenv": "^16.4.5",
+    "nitro-cors": "^0.7.0"
   }
 }
