@@ -1,3 +1,5 @@
-# Nitro starter
-
-Look at the [nitro quick start](https://nitro.unjs.io/guide#quick-start) to learn more how to get started.
+<h1 align="center">
+  <img src="https://avatars.githubusercontent.com/u/160156210?s=200&v=4" alt="isolated logo" width="100"/>
+  <p>Stremify</p>
+</h1>
+<p align="center">A selfhosted addon for Stremio allowing for streaming from numerous different sources via @movie-web/providers.</p>
