@@ -5,6 +5,7 @@ const sources = ["showbox", "vidsrc", "vidsrcto"] // the other sources seemingly
 
   
 export default eventHandler(async (event) => {
+    
     const path = getRouterParam(event, 'imdb')
     const nonEncoded = decodeURIComponent(path)
     const imdb = nonEncoded.split('.')[0];

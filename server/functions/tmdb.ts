@@ -34,6 +34,7 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY
 
 // Define an interface that includes optional authorization property
 export async function makeTMDBRequest(url: string, appendToResponse?: string): Promise<Response> {
+  
     const headers: {
       accept: 'application/json';
       authorization?: string;

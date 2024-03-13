@@ -5,6 +5,7 @@ const sources = ["showbox", "vidsrc", "vidsrcto"] // the other sources seemingly
 
   
 export default eventHandler(async (event) => {
+    
     const path = getRouterParam(event, 'imdb')
     const imdb = path.split('.')[0];
     const tmdb = await convertImdbIdToTmdbId(imdb)
