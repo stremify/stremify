@@ -9,8 +9,3 @@ Getting started is simple, you can either host it directly via Node, or host on 
 Once you have chosen a provider, you would need to configure the following within the environmental variables as seen in the <b>example.env</b> file:
 <br> <br>
 - TMDB_API_KEY: your TMDB API KEY
-<br>
-- isPrivate: true/false - set to true if you want to prevent unauthorised usage by requiring access tokens
-<br>
-- access_tokens: array - an array of access tokens, only works if isPrivate is set to true
-<br><br>
