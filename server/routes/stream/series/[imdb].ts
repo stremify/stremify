@@ -16,6 +16,7 @@ export default eventHandler(async (event) => {
     }
     const tmdb = await convertImdbIdToTmdbId(mediaInfo.imdbid)
     const media = await getShowMediaDetails(tmdb, mediaInfo.season, mediaInfo.episode)
+    console.log(media)
     const output: any = { streams: [] };
 
     for (const source of sources) {
