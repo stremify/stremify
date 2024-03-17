@@ -4,7 +4,6 @@ Selfhosting Stremify is required in order to use most of the foreign providers t
 There are 4 self-hosting methods available, depending on what your use case is:
 
 ## Starting a local-hosted instance
-If you choose to host without SSL - you will not be able to open the addon in a browser environment and you may face some issues, depending on what platforms you are trying to use the addon on.
 
 Ensure that NPM, Git and Node are installed on your system. Once that is done proceed with:
 ```sh
