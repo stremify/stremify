@@ -10,7 +10,6 @@ const baseurl = "https://meinecloud.click/"
 export async function scrapeMeinecloud(imdbid) {
     const finalstreams = []
     const url = `${baseurl}/movie/${imdbid}`;
-    console.log(url)
 
     try {
       const response = await fetch(url);

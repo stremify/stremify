@@ -49,14 +49,17 @@ export default eventHandler((event) => {
     <div class="content">
       <h1>Stremify</h1>
       <p>Version: 2.6.0</p>
-      <a id="install-link" class="button">Install Plugin</a>
+      <a id="install-link" class="button">Installation Method One</a>
+      <a id="alt-install-link" class="button">Installation Method Two</a>
     </div>
   
     <script>
       function setPluginInstallLink() {
         var currentUrl = window.location.href;
         var pluginUrl = currentUrl + "manifest.json";
+        var pluginUrlAlt = currentUrl + "catalog.json";
       document.getElementById('install-link').setAttribute('href', \`stremio://\${pluginUrl}\`);
+      document.getElementById('alt-install-link').setAttribute('href', \`stremio://\${pluginUrl}\`);
       }
       window.onload = setPluginInstallLink;
     </script>

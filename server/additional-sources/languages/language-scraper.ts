@@ -1,7 +1,7 @@
 // custom providers wrapper
 
 import 'dotenv/config'
-const languages = process.env.languages?.split(',') || [];
+const languages = process.env.foreign_provider_languages?.split(',') || [];
 
 import { scrapeFrembed } from "./fr/frembed";
 import { scrapeKinokiste } from "./de/kinokiste";
@@ -10,28 +10,27 @@ import { scrapeEurostreaming } from "./it/eurostreaming";
 import { scrapeGuardahd } from "./it/guardahd";
 
 
-export async function scrapeCustom(media) {
+export async function scrapeCustom(imdbId, season, episode) {
     let finalstreams = [];
-    if (media.type == "movie") {
-        console.log(languages)
+    if (episode == 0 || episode == "0") {
         for (const language of languages) {
-            if (language == "it") {
-                const streams = await scrapeGuardahd(media.imdbId)
+            if (language.includes("it")) {
+                const streams = await scrapeGuardahd(imdbId)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
                       }
                 }
 
-            } else if (language == "fr") {
-                const streams = await scrapeFrembed(media.imdbId, 0, 0)
+            } else if (language.includes("fr")) {
+                const streams = await scrapeFrembed(imdbId, 0, 0)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
                       }
                 }
-            } else if (language == "de") {
-                const streams = await scrapeMeinecloud(media.imdbId)
+            } else if (language.includes("de")) {
+                const streams = await scrapeMeinecloud(imdbId)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
@@ -40,25 +39,24 @@ export async function scrapeCustom(media) {
             }
             
         }
-    } else if (media.type == "show") {
+    } else {
         for (const language of languages) {
-            if (language == "it") {
-                const streams = await scrapeEurostreaming(media.imdbId, media.season.number, media.episode.number)
+            if (language.includes("it")) {
+                const streams = await scrapeEurostreaming(imdbId, season, episode)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
                       }
                 }
-            } else if (language == "fr") {
-                const streams = await scrapeFrembed(media.imdbId, media.season.number, media.season.episode)
-                console.log(streams)
+            } else if (language.includes("fr")) {
+                const streams = await scrapeFrembed(imdbId, season, episode)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
                       }
                 }
-            } else if (language == "de") {
-                const streams = await scrapeKinokiste(media.imdb, media.season.number, media.episode.number)
+            } else if (language.includes("de")) {
+                const streams = await scrapeKinokiste(imdbId, season, episode)
                 if (streams != null) {
                     for (let i = 0; i < streams.length; i++) {
                         finalstreams.push(streams[i]);
@@ -68,5 +66,6 @@ export async function scrapeCustom(media) {
             
         }
     }
+    
     return(finalstreams)
 }
