@@ -12,7 +12,7 @@ $ git clone stremify/stremify
 $ cd stremify
 $ npm i
 {configure .env file to your liking}
-$ npm run start
+$ npm run dev
 ```
 Once that is done your Stremify instance will be acessible from localhost:3000. It is currently being hosted without SSL, so it will **usually not** work in browsers. If you wish to use SSL in your instance, please refer to the steps below.
 
