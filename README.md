@@ -15,6 +15,8 @@ To get started with selfhosting, look into the selfhosting.md document.
 | frembed       | FR       | Series, Movies | Voe, Uqload                      |
 | Eurostreaming | IT       | Series         | Dropload, Supervideo             |
 | GuardaHD      | IT       | Movies         | Dropload, Supervideo, Streamtape |
+| Verhdlink     | ES       | Movies         | Dropload, Supervideo, Streamtape |
+| Cinehdplus    | ES       | Series         | Dropload, Supervideo             |
 
 | Embed/Server Name | Limitations                                                |
 |------------|------------------------------------------------------------|
