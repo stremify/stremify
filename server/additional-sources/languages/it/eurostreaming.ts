@@ -22,7 +22,6 @@ export async function scrapeEurostreaming(imdb, season, episode) {
           const searchRegex = /<h2><a href="([^"]+)"[^>]*>/g;
           const searchMatchesIterator = searchResponse.matchAll(searchRegex);
         
-          // Convert matchAll iterator to array and map to extract URLs
           const urls = Array.from(searchMatchesIterator, match => match[1]);
           
           const episodeFetch = await fetch(urls[0], {

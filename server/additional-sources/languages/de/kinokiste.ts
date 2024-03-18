@@ -18,7 +18,6 @@ export async function scrapeKinokiste(imdb, season, episode) {
           const searchRegex = /<a href="([^"]+)">\s*<img src="/g;
           const searchMatchesIterator = searchResponse.matchAll(searchRegex);
         
-          // Convert matchAll iterator to array and map to extract URLs
           const urls = Array.from(searchMatchesIterator, match => match[1]);
           
           const episodeFetch = await fetch(urls[0], {

@@ -56,10 +56,10 @@ export default eventHandler((event) => {
     <script>
       function setPluginInstallLink() {
         var currentUrl = window.location.href;
-        var pluginUrl = currentUrl + "manifest.json";
-        var pluginUrlAlt = currentUrl + "catalog.json";
+        var pluginUrl = currentUrl.replace("https://", "").replace("http://", "") + "manifest.json";
+        var pluginUrlAlt = currentUrl.replace("https://", "").replace("http://", "") + "catalog.json";
       document.getElementById('install-link').setAttribute('href', \`stremio://\${pluginUrl}\`);
-      document.getElementById('alt-install-link').setAttribute('href', \`stremio://\${pluginUrl}\`);
+      document.getElementById('alt-install-link').setAttribute('href', \`stremio://\${pluginUrlAlt}\`);
       }
       window.onload = setPluginInstallLink;
     </script>

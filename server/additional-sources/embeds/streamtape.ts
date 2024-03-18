@@ -36,7 +36,6 @@ export async function streamtapeResolve(link: URL) {
         if (response.ok) {
             const htmlContent = await response.text();
             const $ = cheerio.load(htmlContent);
-
             let scriptContent = '';
             $('script').each((index, element) => {
                 const scriptText = $(element).html();
@@ -57,8 +56,7 @@ export async function streamtapeResolve(link: URL) {
 
                     let rawLinkPart1 = rawLink.replace(/\(.*?\)/, '');
                     let mp4Link = `http:/${rawLinkPart1 + rawLinkPart2}`.replace(' ', '');
-
-                    return mp4Link.replace(`replace('  .substring(1).substring(2)', "")`, "");
+                    return mp4Link.replace(`  .substring(1).substring(2)`, ``);
                 }
             }
         }
