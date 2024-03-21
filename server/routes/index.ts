@@ -13,51 +13,59 @@ export default eventHandler(async (event) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stremify</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-color: #f0f0f0;
-      }
-  
-      #base64-result {
-        font-family: 'Courier New', Courier, monospace;
-        background-color: #f9f9f9;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 8px;
-        width: 100%;
-        box-sizing: border-box;
-        margin-top: 10px;
-      }
-  
-      .content {
-        text-align: center;
-        max-width: 600px;
-        padding: 20px;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-  
-      .button {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #0084ff;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-top: 20px;
-        cursor: pointer;
-      }
-  
-      p {
-        color: #333;
-      }
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #2c003e;
+    }
+    
+    #base64-result {
+      font-family: 'Courier New', Courier, monospace;
+      background-color: #3d2c55;
+      border: 1px solid #5d536b;
+      border-radius: 4px;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+      color: #e4d7f5;
+    }
+    
+    .content {
+      text-align: center;
+      max-width: 600px;
+      padding: 20px;
+      background-color: #4a3653;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      color: #e4d7f5;
+    }
+    
+    .button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #7b4b94;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    
+    .button:hover {
+      background-color: #a267ac;
+    }
+    
+    p {
+      color: #e4d7f5;
+    }
+    
     </style>
   </head>
   
