@@ -1,7 +1,5 @@
 // movie only
 
-// todo: add doodstream + mixdrop to be scraped for meinecloud, this provider n guardahd too
-
 import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
 import { streamtapeResolve } from "../../embeds/streamtape";
 
@@ -28,6 +26,7 @@ export async function scrapeVerdahd(imdbid) {
             const droploadregex = /dropload\.io\/([^"]+)/g;
             const supervideoregex = /supervideo\.cc\/([^"]+)/g;
             const streamtaperegex = /https:\/\/streamtape\.com\/([^"]+)/g;
+            const upstreamregex = /upstream\.to\/([^"]+)/g;
             let lang = ""
 
             if (stringedcontent.includes("latino")) {
@@ -70,7 +69,6 @@ export async function scrapeVerdahd(imdbid) {
                     title: `Verhdlink ${lang} - auto (supervideo.cc)`
                 })
             }
-
         }
         return (finalstreams)
 

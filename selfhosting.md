@@ -36,5 +36,6 @@ For faster setup you are also able to copy the ``example.env`` and fill out the 
 ```.env
 TMDB_API_KEY="your tmdb api key, this is only needed if you are also scraping English providers"
 scrape_english="true/false - disables or enables English providers, TMDB API KEY needed if this is set to true"
-foreign_provider_languages="de,it,fr,es - list of languages that you want your instance to scrape, no commas in between the languages"
+foreign_provider_languages="de,it,fr,es - list of languages that you want your instance to scrape, no spaces in between the languages"
+remote_host="true/false - disables same IP hosts for remote instances"
 ```

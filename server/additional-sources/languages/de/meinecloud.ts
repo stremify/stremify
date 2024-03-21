@@ -21,7 +21,7 @@ export async function scrapeMeinecloud(imdbid) {
       const droploadregex = /dropload\.io\/([^"]+)/g;
       const supervideoregex = /supervideo\.cc\/([^"]+)/g;
       const streamtaperegex = /https:\/\/streamtape\.com\/([^"]+)/g;
-
+      const upstreamregex = /upstream\.to\/([^"]+)/g;
 
       let match;
       while ((match = droploadregex.exec(text)) !== null) {

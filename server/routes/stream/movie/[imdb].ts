@@ -48,12 +48,5 @@ export default eventHandler(async (event) => {
         }
     }
 
-
-    const foreignstreams = await scrapeCustom(imdb, 0, 0)
-
-    for (const foreignstream of foreignstreams) {
-        output.streams.push(foreignstream)
-    }
-
     return output;
 });
