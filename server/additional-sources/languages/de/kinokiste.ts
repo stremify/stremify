@@ -1,5 +1,8 @@
 // uses meinecloud for movies, so this is only for series
 import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload"
+import 'dotenv/config'
+
+const remote = process.env.remotely_hosted
 
 const baseurl = "https://kinokiste.live"
 
@@ -28,20 +31,22 @@ export async function scrapeKinokiste(imdb, season, episode) {
 
           const episodeData = await episodeFetch.text()
 
-          const droploadregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a href="([^"]+)">Dropload</a>`);
+          if (remote != "true") {
+            const droploadregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a href="([^"]+)">Dropload</a>`);
 
-          const droploadmatch = droploadregex.exec(episodeData);
-
-          if (droploadmatch != null) {
-            const url = await superivdeodroploadResolve(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1e/$2'))); // replace adds an /e/ to the url so that we can scrape
-            finalstreams.push(
-                {
-                    name: "Stremify DE",
-                    type: "url",
-                    url: url,
-                    title: `Kinokiste - auto (dropload.io)`
-                }
-            )
+            const droploadmatch = droploadregex.exec(episodeData);
+  
+            if (droploadmatch != null) {
+              const url = await superivdeodroploadResolve(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1e/$2'))); // replace adds an /e/ to the url so that we can scrape
+              finalstreams.push(
+                  {
+                      name: "Stremify DE",
+                      type: "url",
+                      url: url,
+                      title: `Kinokiste - auto (dropload.io)`
+                  }
+              )
+            }
           }
 
           const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);

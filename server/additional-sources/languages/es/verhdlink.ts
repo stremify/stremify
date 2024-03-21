@@ -2,6 +2,9 @@
 
 import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
 import { streamtapeResolve } from "../../embeds/streamtape";
+import 'dotenv/config'
+
+const remote = process.env.remotely_hosted
 
 const baseurl = "https://verhdlink.cam"
 
@@ -37,28 +40,29 @@ export async function scrapeVerdahd(imdbid) {
                 lang = "Castellano"
             }
 
-            while ((match = droploadregex.exec(stringedcontent)) !== null) {
-                const embedurl = `https://${match[0]}`
-                const url = await superivdeodroploadResolve(new URL(embedurl))
-                finalstreams.push({
-                    name: `Stremify ES`,
-                    type: "url",
-                    url: url,
-                    title: `Verhdlink ${lang} - auto (dropload.io)`
-                })
+            if (remote != "true") {
+                while ((match = droploadregex.exec(stringedcontent)) !== null) {
+                    const embedurl = `https://${match[0]}`
+                    const url = await superivdeodroploadResolve(new URL(embedurl))
+                    finalstreams.push({
+                        name: `Stremify ES`,
+                        type: "url",
+                        url: url,
+                        title: `Verhdlink ${lang} - auto (dropload.io)`
+                    })
+                }
+    
+                while ((match = streamtaperegex.exec(stringedcontent)) !== null) {
+                    const initialurl: string = await streamtapeResolve(match[0])
+    
+                    finalstreams.push({
+                        name: "Stremify ES",
+                        type: "url",
+                        url: initialurl,
+                        title: `Verhdlink ${lang} - auto (streamtape.com)`
+                    })
+                }    
             }
-
-            while ((match = streamtaperegex.exec(stringedcontent)) !== null) {
-                const initialurl: string = await streamtapeResolve(match[0])
-
-                finalstreams.push({
-                    name: "Stremify ES",
-                    type: "url",
-                    url: initialurl,
-                    title: `Verhdlink ${lang} - auto (streamtape.com)`
-                })
-            }
-
             while ((match = supervideoregex.exec(stringedcontent)) !== null) {
                 const embedurl = `https://${match[0]}`
                 const url = await superivdeodroploadResolve(new URL(embedurl))

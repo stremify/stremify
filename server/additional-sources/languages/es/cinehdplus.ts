@@ -1,5 +1,8 @@
 // uses verhdlink for movies, so this scraper is for series only :+1:
 import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload"
+import 'dotenv/config'
+
+const remote = process.env.remotely_hosted
 
 const baseurl = "https://cinehdplus.cam"
 
@@ -34,18 +37,21 @@ export async function scrapeCinehdplus(imdb, season, episode) {
       })
 
       const episodeData = await episodeFetch.text()
-      const droploadregex = new RegExp(`data-num="${season}x${episode}".*?data-link="(https://dropload\\.io/embed-\\w+\\.html)"`, 's'); // not the greatest way to do it, but it works ig
 
-      const droploadmatch = droploadregex.exec(episodeData);
+      if (remote != "true") {
+        const droploadregex = new RegExp(`data-num="${season}x${episode}".*?data-link="(https://dropload\\.io/embed-\\w+\\.html)"`, 's'); // not the greatest way to do it, but it works ig
 
-      if (droploadmatch != null) {
-          const url = await superivdeodroploadResolve(new URL(droploadmatch[1]));
-          finalstreams.push({
-              name: "Stremify ES",
-              type: "url",
-              url: url,
-              title: `Cinehdplus ${lang} - auto (dropload.io)`
-          })
+        const droploadmatch = droploadregex.exec(episodeData);
+  
+        if (droploadmatch != null) {
+            const url = await superivdeodroploadResolve(new URL(droploadmatch[1]));
+            finalstreams.push({
+                name: "Stremify ES",
+                type: "url",
+                url: url,
+                title: `Cinehdplus ${lang} - auto (dropload.io)`
+            })
+        }
       }
 
       const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);

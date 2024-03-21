@@ -1,5 +1,3 @@
-// uqload only works with a server connected to as it requires additonal headers
-
 export async function uqloadResolve(link: URL) {
     try {
         const response = await fetch(link, { redirect: 'follow' });

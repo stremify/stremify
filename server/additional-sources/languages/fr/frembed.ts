@@ -2,10 +2,17 @@
 
 import { voeResolve } from "../../embeds/voe";
 import { uqloadResolve } from "../../embeds/uqload";
+import 'dotenv/config'
+
+const remote = process.env.remotely_hosted
 
 const baseurl = "https://frembed.fun/"
 
 export async function scrapeFrembed(imdbid, season, episode) {
+    if (remote == "true") {
+        return(null)
+        // frembed does not have any remote providers unfortunately
+    }
     let url = ""
     if (episode == 0 || episode == "0") {
         // it is a movie

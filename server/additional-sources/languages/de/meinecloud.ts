@@ -4,6 +4,9 @@
 
 import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
 import { streamtapeResolve } from "../../embeds/streamtape";
+import 'dotenv/config'
+
+const remote = process.env.remotely_hosted
 
 const baseurl = "https://meinecloud.click/"
 
@@ -21,29 +24,32 @@ export async function scrapeMeinecloud(imdbid) {
       const droploadregex = /dropload\.io\/([^"]+)/g;
       const supervideoregex = /supervideo\.cc\/([^"]+)/g;
       const streamtaperegex = /https:\/\/streamtape\.com\/([^"]+)/g;
-      const upstreamregex = /upstream\.to\/([^"]+)/g;
-
+      
+      
       let match;
-      while ((match = droploadregex.exec(text)) !== null) {
-        const embedurl = `https://${match[0]}`        
-        const url = await superivdeodroploadResolve(new URL(embedurl))
-            finalstreams.push({
-                name: "Stremify DE",
-                type: "url",
-                url: url,
-                title: `Meinecloud - auto (dropload.io)`
-            })
-      }
-  
-      while ((match = streamtaperegex.exec(text)) !== null) {
-        const initialurl = await streamtapeResolve(match[0])
-        const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
-        finalstreams.push({
-            name: "Stremify DE",
-            type: "url",
-            url: finalurl,
-            title: `Meinecloud - auto (streamtape.com)`
-        })
+
+      if (remote != "true") {
+        while ((match = droploadregex.exec(text)) !== null) {
+          const embedurl = `https://${match[0]}`        
+          const url = await superivdeodroploadResolve(new URL(embedurl))
+              finalstreams.push({
+                  name: "Stremify DE",
+                  type: "url",
+                  url: url,
+                  title: `Meinecloud - auto (dropload.io)`
+              })
+        }
+    
+        while ((match = streamtaperegex.exec(text)) !== null) {
+          const initialurl = await streamtapeResolve(match[0])
+          const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
+          finalstreams.push({
+              name: "Stremify DE",
+              type: "url",
+              url: finalurl,
+              title: `Meinecloud - auto (streamtape.com)`
+          })
+        }
       }
 
       while ((match = supervideoregex.exec(text)) !== null) {
