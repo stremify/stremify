@@ -1,6 +1,6 @@
 // uses guardahd for movies, so this is only for series
 
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload"
+import { evalResolver } from "../../embeds/evalResolver"
 import 'dotenv/config'
 
 const remote = process.env.remotely_hosted
@@ -41,7 +41,7 @@ export async function scrapeEurostreaming(imdb, season, episode) {
             const droploadmatch = droploadregex.exec(episodeData);
   
             if (droploadmatch != null) {
-              const url = await superivdeodroploadResolve(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1e/$2'))); // replace adds an /e/ to the url so that we can scrape
+              const url = await evalResolver(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1e/$2'))); // replace adds an /e/ to the url so that we can scrape
               finalstreams.push(
                   {
                       name: "Stremify IT",
@@ -57,7 +57,7 @@ export async function scrapeEurostreaming(imdb, season, episode) {
 
           const supervideomatch = supervideoregex.exec(episodeData);
           if (supervideomatch != null) {
-            const url = await superivdeodroploadResolve(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
+            const url = await evalResolver(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
             
             finalstreams.push(
                 {

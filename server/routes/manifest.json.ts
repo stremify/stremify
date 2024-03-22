@@ -14,7 +14,11 @@ const manifest = {
 	"idPrefixes": [
 		"tt"
 	],
-	"logo": "https://i.ibb.co/GWB1pwy/160156210.png"
+	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
+	"behaviorHints":{
+		"configurable":true,
+		"configurationRequired":false
+	}
 }
 
 export default eventHandler((event) => {

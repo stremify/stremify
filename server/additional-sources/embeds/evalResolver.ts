@@ -1,9 +1,10 @@
-// supervideo and dropload are in practice the same in regard to scraping
+// used by supervideo and dropload (renamed everything cause i was possed to use it for another embed too, but things didn't go to plan with it)
+// used for the common eval packed method
 
 import { VM } from "vm2";
 import cheerio from 'cheerio';
 
-export async function superivdeodroploadResolve(link: URL) {
+export async function evalResolver(link: URL) {
     const response = await fetch(link, {
         redirect: 'follow'
     });

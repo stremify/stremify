@@ -73,7 +73,7 @@ export default eventHandler(async (event) => {
     <div class="content">
       <h1>Stremify</h1>
       <p>Version: 2.7.0</p>
-      <a id="install-link" class="button">Default Install (English Only)</a>
+      <a id="install-link" class="button">Default Install</a>
       <p style="color:grey"><i>or</i></p>
       ${section}
       <button type="button" class="button" onclick="encodeSelection()">Get Link</button>

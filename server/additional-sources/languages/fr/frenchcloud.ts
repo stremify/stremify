@@ -1,43 +1,38 @@
-// technically an embed too, but it uses embeds in it's own embeds so...
-// this only gets streamtape and dropload embeds
-// movies only provider
-
 import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
 const remote = process.env.remotely_hosted
 
-const baseurl = "https://guardahd.stream"
+const baseurl = "https://frenchcloud.cam/"
 
-export async function scrapeGuardahd(imdbid) {
+export async function scrapeFrenchcloud(imdbid) {
     const finalstreams = []
     const url = `${baseurl}/movie/${imdbid}`;
+
     try {
-      const response = await fetch(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
-        }
-      })
+      const response = await fetch(url);
       if (!response.ok) {
         return(null)
       }
-      const text = await response.text();  
+      const text = await response.text();
+  
       const droploadregex = /dropload\.io\/([^"]+)/g;
       const supervideoregex = /supervideo\.cc\/([^"]+)/g;
       const streamtaperegex = /https:\/\/streamtape\.com\/([^"]+)/g;
-
-
+      
+      
       let match;
+
       if (remote != "true") {
         while ((match = droploadregex.exec(text)) !== null) {
           const embedurl = `https://${match[0]}`        
           const url = await evalResolver(new URL(embedurl))
               finalstreams.push({
-                  name: "Stremify IT",
+                  name: "Stremify FR",
                   type: "url",
                   url: url,
-                  title: `GuardaHD - auto (dropload.io)`
+                  title: `Frenchcloud - auto (dropload.io)`
               })
         }
     
@@ -45,24 +40,25 @@ export async function scrapeGuardahd(imdbid) {
           const initialurl = await streamtapeResolve(match[0])
           const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
           finalstreams.push({
-              name: "Stremify IT",
+              name: "Stremify FR",
               type: "url",
               url: finalurl,
-              title: `GuardaHD - auto (streamtape.com)`
+              title: `Frenchcloud - auto (streamtape.com)`
           })
         }
       }
 
       while ((match = supervideoregex.exec(text)) !== null) {
         const embedurl = `https://${match[0]}`        
-        const url = await evalResolver(new URL (embedurl))
+        const url = await evalResolver(new URL(embedurl))
             finalstreams.push({
-                name: "Stremify IT",
+                name: "Stremify FR",
                 type: "url",
                 url: url,
-                title: `GuardaHD - auto (supervideo.cc)`
+                title: `Frenchcloud - auto (supervideo.cc)`
             })
       }
+
       return(finalstreams)
   
     } catch (error) {

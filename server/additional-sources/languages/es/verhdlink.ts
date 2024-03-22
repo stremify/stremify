@@ -1,6 +1,6 @@
 // movie only
 
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
+import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
@@ -43,7 +43,7 @@ export async function scrapeVerdahd(imdbid) {
             if (remote != "true") {
                 while ((match = droploadregex.exec(stringedcontent)) !== null) {
                     const embedurl = `https://${match[0]}`
-                    const url = await superivdeodroploadResolve(new URL(embedurl))
+                    const url = await evalResolver(new URL(embedurl))
                     finalstreams.push({
                         name: `Stremify ES`,
                         type: "url",
@@ -65,7 +65,7 @@ export async function scrapeVerdahd(imdbid) {
             }
             while ((match = supervideoregex.exec(stringedcontent)) !== null) {
                 const embedurl = `https://${match[0]}`
-                const url = await superivdeodroploadResolve(new URL(embedurl))
+                const url = await evalResolver(new URL(embedurl))
                 finalstreams.push({
                     name: "Stremify ES",
                     type: "url",

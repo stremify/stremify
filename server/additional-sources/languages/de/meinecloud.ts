@@ -2,7 +2,7 @@
 // this only gets streamtape and dropload embeds
 // movies only provider
 
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
+import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
@@ -31,7 +31,7 @@ export async function scrapeMeinecloud(imdbid) {
       if (remote != "true") {
         while ((match = droploadregex.exec(text)) !== null) {
           const embedurl = `https://${match[0]}`        
-          const url = await superivdeodroploadResolve(new URL(embedurl))
+          const url = await evalResolver(new URL(embedurl))
               finalstreams.push({
                   name: "Stremify DE",
                   type: "url",
@@ -54,7 +54,7 @@ export async function scrapeMeinecloud(imdbid) {
 
       while ((match = supervideoregex.exec(text)) !== null) {
         const embedurl = `https://${match[0]}`        
-        const url = await superivdeodroploadResolve(new URL(embedurl))
+        const url = await evalResolver(new URL(embedurl))
             finalstreams.push({
                 name: "Stremify DE",
                 type: "url",

@@ -5,7 +5,11 @@ import { scrapeCustomProviders } from '../additional-sources/languages/id-based-
 
 export default defineEventHandler(async (event) => {
   const url = new URL(event.req.url, `http://${event.req.headers.host}`);
+  console.log(url)
 
+  if (url.toString().includes("config")) {
+    return sendRedirect(event, '/');
+  }
   const manifestMatch = url.pathname.match(/^\/([^\/]+)\/manifest\.json$/);
   if (manifestMatch) {
     return sendRedirect(event, '/manifest.json');

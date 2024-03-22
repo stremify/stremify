@@ -1,5 +1,5 @@
 // uses verhdlink for movies, so this scraper is for series only :+1:
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload"
+import { evalResolver } from "../../embeds/evalResolver"
 import 'dotenv/config'
 
 const remote = process.env.remotely_hosted
@@ -44,7 +44,7 @@ export async function scrapeCinehdplus(imdb, season, episode) {
         const droploadmatch = droploadregex.exec(episodeData);
   
         if (droploadmatch != null) {
-            const url = await superivdeodroploadResolve(new URL(droploadmatch[1]));
+            const url = await evalResolver(new URL(droploadmatch[1]));
             finalstreams.push({
                 name: "Stremify ES",
                 type: "url",
@@ -58,7 +58,7 @@ export async function scrapeCinehdplus(imdb, season, episode) {
 
       const supervideomatch = supervideoregex.exec(episodeData);
       if (supervideomatch != null) {
-          const url = await superivdeodroploadResolve(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
+          const url = await evalResolver(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
 
           finalstreams.push({
               name: "Stremify ES",

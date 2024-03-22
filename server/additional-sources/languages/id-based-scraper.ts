@@ -5,6 +5,7 @@ import { scrapeEurostreaming } from "./it/eurostreaming";
 import { scrapeGuardahd } from "./it/guardahd";
 import { scrapeVerdahd } from './es/verhdlink'; 
 import { scrapeCinehdplus } from './es/cinehdplus';
+import { scrapeFrenchcloud } from "./fr/frenchcloud";
 
 import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from "../../functions/tmdb";
 import { getMedia } from "../../functions/providers";
@@ -21,6 +22,7 @@ const movies = new Map<string, (imdbid: string) => Promise<any>>([
     ["meinecloud", async (imdbid: string) => await scrapeMeinecloud(imdbid)],
     ["guardahd", async (imdbid: string) => await scrapeGuardahd(imdbid)],
     ["verhdlink", async (imdbid: string) => await scrapeVerdahd(imdbid)],
+    ["frenchcloud", async (imdbid: string) => await scrapeFrenchcloud(imdbid)]
 ]);
 
 const series = new Map<string, (imdbid: string, season: string, episode: string) => Promise<any>>([
@@ -32,6 +34,7 @@ const series = new Map<string, (imdbid: string, season: string, episode: string)
 
 const info = new Map<string, any>([
     ["frembed", {name: "FRembed", lang_emoji: "🇫🇷"}],
+    ["frenchcloud", {name: "Frenchcloud", lang_emoji: "🇫🇷"}],
     ["meinecloud", {name: "Meinecloud", lang_emoji: "🇩🇪"}],
     ["kinokiste", {name: "Kinokiste", lang_emoji: "🇩🇪"}],
     ["cinehdplus", {name: "CineHDplus", lang_emoji: "🇪🇸🇲🇽"}],
