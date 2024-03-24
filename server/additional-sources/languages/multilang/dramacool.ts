@@ -9,7 +9,8 @@ const tmdb_api_key = process.env.TMDB_API_KEY
 
 const baseurl = 'https://dramacool.com.pa'
 
-export async function scrapeDramacool(imdb, episode, season, media ? ) {
+
+export async function scrapeDramacool(id, season, episode, media ? ) {
     let finalstreams = []
     if (tmdb_api_key == null || tmdb_api_key == '' && media == null) {
         console.warn('No TMDB API key provided, it is required for dramacool.')
@@ -18,133 +19,150 @@ export async function scrapeDramacool(imdb, episode, season, media ? ) {
 
     if (episode == 0) {
         if (media == null) {
-            media = await getMovieMediaDetails(imdb)
-        }
-
-        const searchResults = await fetch(`https://dramacool.com.pa/search?type=movies&keyword=${encodeURIComponent(media.title)}`)
-        if (searchResults.ok != true) {
-            return ([])
-        }
-
-        const searchResultsResponse = await searchResults.text()
-
-        const URLRegex = /<a[^>]*href="([^"]*)"[^>]*class="img">/g;
-        let match
-        while ((match = URLRegex.exec(searchResultsResponse)) !== null) {
-
-            if (match.index === URLRegex.lastIndex) {
-                URLRegex.lastIndex++;
-            }
-
-            const link = match[1];
-
-
-            const episodeData = await fetch(`${baseurl}/${link}`)
-
-            if (episodeData.ok != true) {
+            if (id.includes('tt') == true) {
+                id = await convertImdbIdToTmdbId(id)
+                media = await getMovieMediaDetails(id)
+            } else if (id.includes('tmdb')) {
+                media = await getMovieMediaDetails(id)
+            } else {
                 return ([])
             }
 
-            const nameRegex = /<h1>([^"]*)<\/h1>/
-
-            const name = nameRegex.exec(await episodeData.text())[1]
-
-            const episodeurl = await fetch(`${baseurl}/${link.split('/')[2]}-episode-1.html`)
-
-            if (episodeurl.ok != true) {
-                return([])
-            }
-
-            const iframe_regex = /<iframe [^']* src="(\/\/pladrac[^"]*)/
-
-            const iframe = iframe_regex.exec(await episodeurl.text())[1]
-
-            const iframeData = await fetch(`https:${iframe}`)
-
-            if (iframeData.ok != true) {
-                return([])
-            }
-
-            const embedplusRegex = /https:\/\/pladrac.net\/embedplus\?[^']*/
-
-            const embedplus = embedplusRegex.exec(await iframeData.text())[0]
-
-            const finalURL = await pladaricResolver(new URL(`https${embedplus}`))
-
-            if (finalURL != null) {
-                finalstreams.push({
-                    name: "Stremify",
-                    type: "url",
-                    url: finalURL,
-                    title: `DramaCool - ${name}`
-                })
-            }
-        }
-
-
-    } else {
-        if (media == null) {
-            media = await getMovieMediaDetails(imdb)
-        }
-        const searchResults = await fetch(`https://dramacool.com.pa/search?type=movies&keyword=${encodeURIComponent(media.title)}`)
-        if (searchResults.ok != true) {
-            return ([])
-        }
-
-        const searchResultsResponse = await searchResults.text()
-
-        const URLRegex = /<a[^>]*href="([^"]*)"[^>]*class="img">/g;
-        let match
-        while ((match = URLRegex.exec(searchResultsResponse)) !== null) {
-
-            if (match.index === URLRegex.lastIndex) {
-                URLRegex.lastIndex++;
-            }
-
-            const link = match[1];
-
-
-            const episodeData = await fetch(`${baseurl}/${link}`)
-
-            if (episodeData.ok != true) {
+            const searchResults = await fetch(`https://dramacool.com.pa/search?type=movies&keyword=${encodeURIComponent(media.title)}`)
+            if (searchResults.ok != true) {
                 return ([])
             }
 
-            const nameRegex = /<h1>([^"]*)<\/h1>/
+            const searchResultsResponse = await searchResults.text()
 
-            const name = nameRegex.exec(await episodeData.text())[1]
+            const URLRegex = /<a[^>]*href="([^"]*)"[^>]*class="img">/g;
+            let match
+            while ((match = URLRegex.exec(searchResultsResponse)) !== null) {
 
-            const episodeurl = await fetch(`${baseurl}/${link.split('/')[2]}-episode-${episode}.html`)
+                if (match.index === URLRegex.lastIndex) {
+                    URLRegex.lastIndex++;
+                }
 
-            if (episodeurl.ok != true) {
-                return([])
-            }
+                const link = match[1];
 
-            const iframe_regex = /<iframe [^']* src="(\/\/pladrac[^"]*)/
 
-            const iframe = iframe_regex.exec(await episodeurl.text())[1]
+                const episodeData = await fetch(`${baseurl}/${link}`)
 
-            const iframeData = await fetch(`https:${iframe}`)
+                if (episodeData.ok != true) {
+                    return ([])
+                }
 
-            if (iframeData.ok != true) {
-                return([])
-            }
+                const nameRegex = /<h1>([^"]*)<\/h1>/
 
-            const embedplusRegex = /https:\/\/pladrac.net\/embedplus\?[^']*/
+                const name = nameRegex.exec(await episodeData.text())[1]
 
-            const embedplus = embedplusRegex.exec(await iframeData.text())[0]
+                const episodeurl = await fetch(`${baseurl}/${link.split('/')[2]}-episode-1.html`)
 
-            const finalURL = await pladaricResolver(new URL(`https${embedplus}`))
+                if (episodeurl.ok != true) {
+                    return ([])
+                }
 
-            if (finalURL != null) {
-                finalstreams.push({
-                    name: "Stremify",
-                    type: "url",
-                    url: finalURL,
-                    title: `DramaCool - ${name} S${season} E${episode}`
-                })
+                const iframe_regex = /<iframe [^']* src="(\/\/pladrac[^"]*)/
+
+                const iframe = iframe_regex.exec(await episodeurl.text())[1]
+
+                const iframeData = await fetch(`https:${iframe}`)
+
+                if (iframeData.ok != true) {
+                    return ([])
+                }
+
+                const embedplusRegex = /https:\/\/pladrac.net\/embedplus\?[^']*/
+
+                const embedplus = embedplusRegex.exec(await iframeData.text())[0]
+
+                const finalURL = await pladaricResolver(new URL(`https${embedplus}`))
+
+                if (finalURL != null) {
+                    finalstreams.push({
+                        name: "Stremify",
+                        type: "url",
+                        url: finalURL,
+                        title: `DramaCool - ${name}`
+                    })
+                }
             }
         }
+
+        } else {
+            console.log(media)
+            if (media == null) {
+                if (id.includes('tt')) {
+                    const tmdb = await convertImdbIdToTmdbId(id)
+                    media = await getShowMediaDetails(tmdb, season, episode)
+                } else if (id.includes('tmdb')) {
+                    media = await getShowMediaDetails(id, season, episode)
+                } else {
+                    return ([])
+                }
+            }
+            const searchResults = await fetch(`https://dramacool.com.pa/search?type=movies&keyword=${encodeURIComponent(media.title)}`)
+            if (searchResults.ok != true) {
+                return ([])
+            }
+
+            const searchResultsResponse = await searchResults.text()
+
+            const URLRegex = /<a[^>]*href="([^"]*)"[^>]*class="img">/g;
+            let match
+            while ((match = URLRegex.exec(searchResultsResponse)) !== null) {
+
+                if (match.index === URLRegex.lastIndex) {
+                    URLRegex.lastIndex++;
+                }
+
+                const link = match[1];
+
+
+                const episodeData = await fetch(`${baseurl}/${link}`)
+
+                if (episodeData.ok != true) {
+                    return ([])
+                }
+
+                const nameRegex = /<h1>([^"]*)<\/h1>/
+
+                const name = nameRegex.exec(await episodeData.text())[1]
+
+                const episodeurl = await fetch(`${baseurl}/${link.split('/')[2]}-episode-${episode}.html`)
+
+                if (episodeurl.ok != true) {
+                    return ([])
+                }
+
+                const iframe_regex = /<iframe [^']* src="(\/\/pladrac[^"]*)/
+
+                const iframe = iframe_regex.exec(await episodeurl.text())[1]
+
+                const iframeData = await fetch(`https:${iframe}`)
+
+                if (iframeData.ok != true) {
+                    return ([])
+                }
+
+                const embedplusRegex = /https:\/\/pladrac.net\/embedplus\?[^']*/
+
+                const embedplus = embedplusRegex.exec(await iframeData.text())[0]
+
+                const finalURL = await pladaricResolver(new URL(`https${embedplus}`))
+
+                if (finalURL != null) {
+                    finalstreams.push({
+                        name: "Stremify",
+                        type: "url",
+                        url: finalURL,
+                        title: `DramaCool - ${name} S${season} E${episode}`,
+                        behaviorHints: {
+                            bingeGroup: `dramacool_${encodeURIComponent(name)}`
+                        }
+                    })
+                }
+            }
+        }
+        return (finalstreams)
     }
-    return(finalstreams)
-}

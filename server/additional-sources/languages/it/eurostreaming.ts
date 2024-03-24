@@ -47,7 +47,10 @@ export async function scrapeEurostreaming(imdb, season, episode) {
                       name: "Stremify IT",
                       type: "url",
                       url: url,
-                      title: `Eurostreaming - auto (dropload.io)`
+                      title: `Eurostreaming - auto (dropload.io)`,
+                      behaviorHints: {
+                        bingeGroup: `it_dropload`
+                      }
                   }
               )
             }
@@ -64,7 +67,10 @@ export async function scrapeEurostreaming(imdb, season, episode) {
                     name: "Stremify IT",
                     type: "url",
                     url: url,
-                    title: `Eurostreaming - auto (supervideo.cc)`
+                    title: `Eurostreaming - auto (supervideo.cc)`,
+                    behaviorHints: {
+                      bingeGroup: `it_supervideo`
+                    }
                 }
             )
           }

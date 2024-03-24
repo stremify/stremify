@@ -45,7 +45,10 @@ export default eventHandler(async (event) => {
                                     name: "Stremify",
                                     type: "url",
                                     url: quality.url,
-                                    title: `${source} - ${qualityKey}p (${embed})`
+                                    title: `${source} - ${qualityKey}p (${embed})`,
+                                    behaviorHints: {
+                                        bingeGroup: `en_${source}_${embed}_${qualityKey}`
+                                    }
                                 });
                             }
                         } else if (streamItem.type == "hls") {
@@ -53,7 +56,10 @@ export default eventHandler(async (event) => {
                                 name: "Stremify",
                                 type: "url",
                                 url: streamItem.playlist,
-                                title: `${source} - auto (${embed})`
+                                title: `${source} - auto (${embed})`,
+                                behaviorHints: {
+                                    bingeGroup: `en_${source}_${embed}`
+                                }
                             })
                         }
                     }

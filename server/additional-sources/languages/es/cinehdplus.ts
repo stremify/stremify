@@ -49,7 +49,10 @@ export async function scrapeCinehdplus(imdb, season, episode) {
                 name: "Stremify ES",
                 type: "url",
                 url: url,
-                title: `Cinehdplus ${lang} - auto (dropload.io)`
+                title: `Cinehdplus ${lang} - auto (dropload.io)`,
+                behaviorHints: {
+                    bingeGroup: `es_dropload`
+                }
             })
         }
       }
@@ -64,7 +67,10 @@ export async function scrapeCinehdplus(imdb, season, episode) {
               name: "Stremify ES",
               type: "url",
               url: url,
-              title: `Cinehdplus ${lang} - auto (supervideo.cc)`
+              title: `Cinehdplus ${lang} - auto (supervideo.cc)`,
+              behaviorHints: {
+                bingeGroup: `es_supervideo`
+            }
           })
       }
 

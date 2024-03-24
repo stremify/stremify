@@ -43,7 +43,10 @@ export async function scrapeKinokiste(imdb, season, episode) {
                       name: "Stremify DE",
                       type: "url",
                       url: url,
-                      title: `Kinokiste - auto (dropload.io)`
+                      title: `Kinokiste - auto (dropload.io)`,
+                      behaviorHints: {
+                        bingeGroup: `de_dropload`
+                      }
                   }
               )
             }
@@ -60,7 +63,10 @@ export async function scrapeKinokiste(imdb, season, episode) {
                     name: "Stremify DE",
                     type: "url",
                     url: url,
-                    title: `Kinokiste - auto (supervideo.cc)`
+                    title: `Kinokiste - auto (supervideo.cc)`,
+                    behaviorHints: {
+                      bingeGroup: `de_supervideo`
+                    }
                 }
             )
           }

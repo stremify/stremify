@@ -42,7 +42,10 @@ export async function scrapeFrembed(imdbid, season, episode) {
                     name: "Stremify FR",
                     type: "url",
                     url: url,
-                    title: `frembed - auto (voe.sx)`
+                    title: `frembed - auto (voe.sx)`,
+                    behaviorHints: {
+                        bingeGroup: `fr_voe`
+                    }
                 };
         
             } else if (decodedurl.includes("uqload.to") || decodedurl.includes("uqload.co")) {
@@ -54,7 +57,8 @@ export async function scrapeFrembed(imdbid, season, episode) {
                     title: `frembed - auto (uqload)`,
                     behaviorHints: {
                         proxyHeaders: {"request": { "Referer": "https://uqload.to/" }},
-                        notWebReady: true
+                        notWebReady: true,
+                        bingeGroup: 'fr_uqload'
                     }
                 };
         
