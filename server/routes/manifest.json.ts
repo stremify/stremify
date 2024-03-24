@@ -12,7 +12,7 @@ const manifest = {
 	"name": "Stremify",
 	"description": "A multi-server streaming addon.",
 	"idPrefixes": [
-		"tt"
+		"tmdb:", "tt"
 	],
 	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
 	"behaviorHints":{

@@ -77,7 +77,6 @@ export async function scrapeVerdahd(imdbid) {
         return (finalstreams)
 
     } catch (error) {
-        console.log(error)
         return (null)
     }
 

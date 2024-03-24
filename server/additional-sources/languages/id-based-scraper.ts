@@ -13,23 +13,26 @@ import { getMedia } from "../../functions/providers";
 const sources = ["showbox", "vidsrc", "vidsrcto"]
 
 import 'dotenv/config'
+import { scrapeDramacool } from "./multilang/dramacool";
 const disabled_providers = process.env.disabled_foreign_providers || '';
 const scrape_foreign_providers = process.env.scrape_foreign_providers || '';
 const scrape_english = process.env.scrape_english || '';
 
-const movies = new Map<string, (imdbid: string) => Promise<any>>([
+const movies: Map<string, (imdbid: string, media?: any) => Promise<any>> = new Map([
     ["frembed", async (imdbid: string) => await scrapeFrembed(imdbid, 0, 0)],
     ["meinecloud", async (imdbid: string) => await scrapeMeinecloud(imdbid)],
     ["guardahd", async (imdbid: string) => await scrapeGuardahd(imdbid)],
     ["verhdlink", async (imdbid: string) => await scrapeVerdahd(imdbid)],
-    ["frenchcloud", async (imdbid: string) => await scrapeFrenchcloud(imdbid)]
+    ["frenchcloud", async (imdbid: string) => await scrapeFrenchcloud(imdbid)],
+    ["dramacool", async (imdbid: string, media?: any) => scrapeDramacool(imdbid, 0, 0, media)]
 ]);
 
-const series = new Map<string, (imdbid: string, season: string, episode: string) => Promise<any>>([
+const series = new Map<string, (imdbid: string, season: string, episode: string, media?: any) => Promise<any>>([
     ["kinokiste", async (imdbid: string, season: string, episode: string) => await scrapeKinokiste(imdbid, season, episode)],
     ["cinehdplus", async (imdbid: string, season: string, episode: string) => await scrapeCinehdplus(imdbid, season, episode)],
     ["frembed", async (imdbid: string, season: string, episode: string) => await scrapeFrembed(imdbid, season, episode)],
     ["eurostreaming", async (imdbid: string, season: string, episode: string) => await scrapeEurostreaming(imdbid, season, episode)],
+    ["dramacool", async (imdbid: string, season: string, episode: string, media?: any) => scrapeDramacool(imdbid, season, episode, media)]
 ]);
 
 const info = new Map<string, any>([
@@ -41,9 +44,10 @@ const info = new Map<string, any>([
     ["verhdlink", {name: "VerHDlink", lang_emoji: "🇪🇸🇲🇽"}],
     ["eurostreaming", {name: "EuroStreaming", lang_emoji: "🇮🇹"}],
     ["guardahd", {name: "GuardaHD", lang_emoji: "🇮🇹"}],
+    ["dramacool", {name: "DramaCool", lang_emoji: "🇰🇷🇯🇵🇨🇳🇹🇭🇹🇼"}],
 ]);
 
-export async function scrapeCustomProviders(list, imdb, season, episode) {
+export async function scrapeCustomProviders(list, imdb, season, episode, media?) {
     const output: any = {
         streams: []
     };
@@ -51,7 +55,12 @@ export async function scrapeCustomProviders(list, imdb, season, episode) {
     if (episode == 0 || episode == "0") {
         for (let source of sourcelist) {
             if (source == "en" && scrape_english == "true") {
-                const tmdb = await convertImdbIdToTmdbId(imdb)
+                let tmdb
+                try {
+                    tmdb = await convertImdbIdToTmdbId(imdb)
+                } catch {
+                    continue;
+                }
                 const media = await getMovieMediaDetails(tmdb)
 
                 for (const source of sources) {
@@ -96,7 +105,15 @@ export async function scrapeCustomProviders(list, imdb, season, episode) {
     } else {
         for (let source of sourcelist) {
             if (source == "en" && scrape_english == "true") {
-                const tmdb = await convertImdbIdToTmdbId(imdb)
+                let tmdb;
+                try {
+                    tmdb = await convertImdbIdToTmdbId(imdb);
+                    if (tmdb === null) {
+                        continue; 
+                    }
+                } catch (error) {
+                    continue;
+                }
                 const media = await getShowMediaDetails(tmdb, season, episode)    
                 for (const source of sources) {
                     const stream = await getMedia(media, source)
@@ -130,7 +147,7 @@ export async function scrapeCustomProviders(list, imdb, season, episode) {
                 const scrapingFunction = await series.get(source)
 
                 if (typeof scrapingFunction === 'function') {
-                    const mediaResults = await scrapingFunction(imdb, season, episode);
+                    const mediaResults = await scrapingFunction(imdb, season, episode, media);
                     if (mediaResults != null && Array.isArray(mediaResults)) {
                         for (let mediaResult of mediaResults) {
                             output.streams.push(mediaResult)

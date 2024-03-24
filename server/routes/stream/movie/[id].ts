@@ -11,11 +11,16 @@ export default eventHandler(async (event) => {
         streams: []
     };
 
-    const path = getRouterParam(event, 'imdb')
-    const imdb = path.split('.')[0];
+    const path = getRouterParam(event, 'id')
+    const id = path.split('.')[0];
 
     if (scrape_english == "true") {
-        const tmdb = await convertImdbIdToTmdbId(imdb)
+        let tmdb
+        if (id.startsWith('tmdb') == true) {
+            tmdb = id.replace('tmdb:', '')
+        } else {
+            tmdb = await convertImdbIdToTmdbId(id)
+        }
         const media = await getMovieMediaDetails(tmdb)
 
         for (const source of sources) {

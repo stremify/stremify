@@ -8,20 +8,31 @@ const sources = ["showbox", "vidsrc", "vidsrcto"] // the other sources seemingly
   
 export default eventHandler(async (event) => {
     
-    const path = getRouterParam(event, 'imdb')
+    const path = getRouterParam(event, 'id')
     const nonEncoded = decodeURIComponent(path)
-    const imdb = nonEncoded.split('.')[0];
-    const mediaInfo = {
-        imdbid: imdb.split(':')[0],
-        season: imdb.split(':')[1],
-        episode: imdb.split(':')[2],
-    }
+    const id = nonEncoded.split('.')[0];
 
     const output: any = { streams: [] };
 
     if (scrape_english == "true") {
-        const tmdb = await convertImdbIdToTmdbId(mediaInfo.imdbid)
-        const media = await getShowMediaDetails(tmdb, mediaInfo.season, mediaInfo.episode)    
+        let tmdb
+        let mediaInfo = {season: '', episode: ''}
+
+        if (id.includes('tmdb') == true) {
+            mediaInfo = {
+                season: id.split(':')[2],
+                episode: id.split(':')[3],    
+            }
+            tmdb = id.split(':')[1]
+        } else {
+            mediaInfo = {
+                season: id.split(':')[1],
+                episode: id.split(':')[2],    
+            }
+            tmdb = await convertImdbIdToTmdbId(id.split(':')[0])
+        }
+
+        const media = await getShowMediaDetails(tmdb, mediaInfo.season, mediaInfo.episode)
         for (const source of sources) {
             const stream = await getMedia(media, source)
             for (const embed in stream) {
@@ -50,12 +61,6 @@ export default eventHandler(async (event) => {
                 
             
         }
-    }
-    
-    const foreignstreams = await scrapeCustom(mediaInfo.imdbid, mediaInfo.season, mediaInfo.episode)
-
-    for (const foreignstream of foreignstreams) {
-        output.streams.push(foreignstream)
     }
 
     return output;

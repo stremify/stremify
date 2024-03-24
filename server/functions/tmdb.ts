@@ -147,7 +147,7 @@ export async function makeTMDBRequest(url: string, appendToResponse?: string): P
         if (results.length) {
             return results[0].id;
         } else {
-            console.log('No results found for the provided IMDb ID.');
+            console.log(`No results found for the provided IMDb ID - ${imdbId}`);
             return null;
         }
     } catch (error) {
@@ -168,4 +168,26 @@ export async function separateId(id) {
         season: seasonPart,
         episode: episodePart
     };
+}
+
+export async function totalEpisodes(tmdbId, season, episode) {
+  let totalEpisodes = 0;
+
+  try {
+      const seriesResponse = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${tmdbId}`);
+      const seriesData = await seriesResponse.json();
+      const totalSeasons = seriesData.number_of_seasons;
+
+      for (let seasonNumber = 1; seasonNumber < season; seasonNumber++) {
+          const seasonResponse = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}`);
+          const seasonData = await seasonResponse.json();
+          totalEpisodes += seasonData.episodes.length;
+      }
+
+      totalEpisodes += episode;
+
+      return totalEpisodes;
+  } catch (error) {
+      throw error;
+  }
 }
