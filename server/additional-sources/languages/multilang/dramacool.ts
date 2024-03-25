@@ -17,13 +17,23 @@ export async function scrapeDramacool(id, season, episode, media ? ) {
         return ([])
     }
 
+
     if (episode == 0) {
         if (media == null) {
             if (id.includes('tt') == true) {
                 id = await convertImdbIdToTmdbId(id)
+                if (id == null) {
+                    return([])
+                }
                 media = await getMovieMediaDetails(id)
+                if (media == null) {
+                    return([])
+                }
             } else if (id.includes('tmdb')) {
                 media = await getMovieMediaDetails(id)
+                if (media == null) {
+                    return([])
+                }
             } else {
                 return ([])
             }
@@ -94,7 +104,13 @@ export async function scrapeDramacool(id, season, episode, media ? ) {
             if (media == null) {
                 if (id.includes('tt')) {
                     const tmdb = await convertImdbIdToTmdbId(id)
+                    if (tmdb == null) {
+                        return([])
+                    }
                     media = await getShowMediaDetails(tmdb, season, episode)
+                    if (media == null) {
+                        return([])
+                    }
                 } else if (id.includes('tmdb')) {
                     media = await getShowMediaDetails(id, season, episode)
                 } else {

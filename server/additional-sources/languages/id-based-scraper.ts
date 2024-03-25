@@ -47,7 +47,7 @@ const info = new Map<string, any>([
     ["dramacool", {name: "DramaCool", lang_emoji: "🇰🇷🇯🇵🇨🇳🇹🇭🇹🇼"}],
 ]);
 
-export async function scrapeCustomProviders(list, imdb, season, episode, media?) {
+export async function scrapeCustomProviders(list, id, season, episode, media?) {
     const output: any = {
         streams: []
     };
@@ -55,13 +55,21 @@ export async function scrapeCustomProviders(list, imdb, season, episode, media?)
     if (episode == 0 || episode == "0") {
         for (let source of sourcelist) {
             if (source == "en" && scrape_english == "true") {
-                let tmdb
-                try {
-                    tmdb = await convertImdbIdToTmdbId(imdb)
-                } catch {
-                    continue;
+                if (media == null) {
+                    let tmdb
+                    if (id.startsWith('tmdb') == true) {
+                        tmdb = id.split(':')[1]
+                    } else {
+                        tmdb = await convertImdbIdToTmdbId(id)
+                        if (tmdb == null) {
+                            continue;
+                        }
+                    }
+                    media = await getMovieMediaDetails(tmdb)  
+                    if (media == null) {
+                        continue;
+                    }            
                 }
-                const media = await getMovieMediaDetails(tmdb)
 
                 for (const source of sources) {
                     const stream = await getMedia(media, source)
@@ -92,7 +100,7 @@ export async function scrapeCustomProviders(list, imdb, season, episode, media?)
             } else if (disabled_providers.includes(source) != true && scrape_foreign_providers == "true"){
                 const scrapingFunction = await movies.get(source);
                 if (typeof scrapingFunction === 'function') {
-                    const mediaResults = await scrapingFunction(imdb);
+                    const mediaResults = await scrapingFunction(id);
     
                     if (mediaResults != null && Array.isArray(mediaResults)) {
                         for (let mediaResult of mediaResults) {
@@ -104,17 +112,28 @@ export async function scrapeCustomProviders(list, imdb, season, episode, media?)
         }
     } else {
         for (let source of sourcelist) {
+
             if (source == "en" && scrape_english == "true") {
                 let tmdb;
-                try {
-                    tmdb = await convertImdbIdToTmdbId(imdb);
-                    if (tmdb === null) {
-                        continue; 
+                if (media == null) {
+                    if (id.startsWith('tmdb') == true) {
+                        tmdb = id.split(':')[1]
+                    } else {
+                        tmdb = await convertImdbIdToTmdbId(id)
+                        if (tmdb == null) {
+                            continue;
+                        }
                     }
-                } catch (error) {
-                    continue;
+                    console.log(tmdb, season, episode)
+                    try {
+                        media = await getShowMediaDetails(tmdb, season, episode)
+                        if (media == null) {
+                            continue;
+                        } 
+                    } catch {
+                        continue;
+                    }
                 }
-                const media = await getShowMediaDetails(tmdb, season, episode)    
                 for (const source of sources) {
                     const stream = await getMedia(media, source)
                     for (const embed in stream) {
@@ -151,9 +170,8 @@ export async function scrapeCustomProviders(list, imdb, season, episode, media?)
                 }
             } else if (disabled_providers.includes(source) != true && scrape_foreign_providers == "true"){
                 const scrapingFunction = await series.get(source)
-
                 if (typeof scrapingFunction === 'function') {
-                    const mediaResults = await scrapingFunction(imdb, season, episode, media);
+                    const mediaResults = await scrapingFunction(id, season, episode, media);
                     if (mediaResults != null && Array.isArray(mediaResults)) {
                         for (let mediaResult of mediaResults) {
                             output.streams.push(mediaResult)

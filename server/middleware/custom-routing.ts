@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
     const decodedConfig = Buffer.from(config, 'base64').toString('utf-8');
     if (type == "movie") {
         if (idPath.includes('tmdb')) {
-          const media = await getMovieMediaDetails(idPath)
+          const media = await getMovieMediaDetails(idPath.split(':')[1])
           const mediaData = await scrapeCustomProviders(decodedConfig, media.imdbId, 0, 0, media)
           event.res.end(JSON.stringify(mediaData))
         } else {
