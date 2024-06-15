@@ -10,9 +10,10 @@
     "nitropack": "latest"
   },
   "dependencies": {
-    "@movie-web/providers": "^2.2.2",
+    "@movie-web/providers": "sussy-code/providers",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.4.5",
+    "m3u8-parser": "^7.1.0",
     "nitro-cors": "^0.7.0",
     "vm2": "^3.9.19"
   }

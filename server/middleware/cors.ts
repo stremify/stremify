@@ -1,4 +1,3 @@
-// :file middleware/cors.ts
 import { corsEventHandler } from 'nitro-cors'
 
 export default corsEventHandler(_event => {}, {

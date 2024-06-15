@@ -1,31 +1,6 @@
-const manifest = {
-	"id": "com.stremify",
-	"version": "2.7.0",
-	"catalogs": [],
-	"resources": [
-		"stream"
-	],
-	"types": [
-		"movie",
-		"series"
-	],
-	"name": "Stremify",
-	"description": "A multi-server streaming addon.",
-	"idPrefixes": [
-		"tmdb:", "tt"
-	],
-	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
-	"behaviorHints":{
-		"configurable":true,
-		"configurationRequired":false
-	}
-}
+import { manifest } from "~/middleware/config-routing";
 
 export default eventHandler((event) => {
-
-	setHeader(event, 'Access-Control-Allow-Origin', '*'); // Allow any domain
-	setHeader(event, 'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-	setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return manifest;
-  });
+});
   

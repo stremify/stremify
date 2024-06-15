@@ -1,9 +1,9 @@
-import { buildHTMLselectors } from "../additional-sources/languages/id-based-scraper"
-let section = null;
+import { buildHTMLselectors } from "../additional-sources/languages/custom-wrapper"
+let selectors = null;
 
 export default eventHandler(async (event) => {
-  if (section == null) {
-      section = await buildHTMLselectors()
+  if (selectors == null) {
+    selectors = await buildHTMLselectors()
   }
   return (`
   <html lang="en">
@@ -75,7 +75,7 @@ export default eventHandler(async (event) => {
       <p>Version: 2.7.0</p>
       <a id="install-link" class="button">Default Install</a>
       <p style="color:grey"><i>or</i></p>
-      ${section}
+      ${selectors}
       <button type="button" class="button" onclick="encodeSelection()">Get Link</button>
       <input type="text" id="base64-result" readonly></p>
       <a id="config-install-link" class="button">Install with configuration</a>

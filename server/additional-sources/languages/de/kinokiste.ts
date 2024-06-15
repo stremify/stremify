@@ -2,7 +2,7 @@
 import { evalResolver } from "../../embeds/evalResolver"
 import 'dotenv/config'
 
-const remote = process.env.remotely_hosted
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://kinokiste.live"
 
@@ -31,7 +31,7 @@ export async function scrapeKinokiste(imdb, season, episode) {
 
           const episodeData = await episodeFetch.text()
 
-          if (remote != "true") {
+          /*if (remote != "true") {
             const droploadregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a href="([^"]+)">Dropload</a>`);
 
             const droploadmatch = droploadregex.exec(episodeData);
@@ -50,7 +50,7 @@ export async function scrapeKinokiste(imdb, season, episode) {
                   }
               )
             }
-          }
+          }*/
 
           const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);
 
@@ -71,11 +71,11 @@ export async function scrapeKinokiste(imdb, season, episode) {
             )
           }
 
-
+          console.log(finalstreams)
           return(finalstreams)
 
-    } catch {
-        return(null)
+    } catch(error) {
+      console.log(error)
     }
 
 }

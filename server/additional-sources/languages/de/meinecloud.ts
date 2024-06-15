@@ -6,17 +6,19 @@ import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
-const remote = process.env.remotely_hosted
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://meinecloud.click/"
 
 export async function scrapeMeinecloud(imdbid) {
+  console.log(`${baseurl}/movie/${imdbid}`)
     const finalstreams = []
     const url = `${baseurl}/movie/${imdbid}`;
 
     try {
       const response = await fetch(url);
       if (!response.ok) {
+        console.log('tsk')
         return(null)
       }
       const text = await response.text();
@@ -27,9 +29,9 @@ export async function scrapeMeinecloud(imdbid) {
       
       
       let match;
-
+      
       if (remote != "true") {
-        while ((match = droploadregex.exec(text)) !== null) {
+        /*while ((match = droploadregex.exec(text)) !== null) {
           const embedurl = `https://${match[0]}`        
           const url = await evalResolver(new URL(embedurl))
               finalstreams.push({
@@ -38,7 +40,7 @@ export async function scrapeMeinecloud(imdbid) {
                   url: url,
                   title: `Meinecloud - auto (dropload.io)`
               })
-        }
+        }*/
     
         while ((match = streamtaperegex.exec(text)) !== null) {
           const initialurl = await streamtapeResolve(match[0])

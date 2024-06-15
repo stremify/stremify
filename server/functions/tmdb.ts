@@ -2,8 +2,8 @@
  * This file includes code derived from @movie-web/providers by movie-web.
  * @movie-web/providers is licensed under the MIT License.
  * 
- * You can find the original source and license at:
- * https://github.com/movie-web/providers
+ * The original source of @movie-web/providers is no longer available, unfortunately. You can find an actively maintained version on the following link:
+ * https://github.com/sussy-code/providers
  * 
  * MIT License
  * 
@@ -189,5 +189,25 @@ export async function totalEpisodes(tmdbId, season, episode) {
       return totalEpisodes;
   } catch (error) {
       throw error;
+  }
+}
+
+export async function getEpisodeIMDbID(tmdb, season, episode): Promise<{ imdb_id: string | null }> {
+  console.log(tmdb, season, episode)
+  const url = `https://api.themoviedb.org/3/tv/${tmdb}/season/${season}/episode/${episode}/external_ids`;
+
+  try {
+    const response = await makeTMDBRequest(url);
+
+    const jsonResponse = await response.json();
+
+    console.log(jsonResponse)
+
+    const imdbId = jsonResponse.imdb_id ? jsonResponse.imdb_id : null;
+
+    return(imdbId);
+  } catch (error) {
+    console.error('Failed to get episode IMDb ID:', error);
+    throw error;
   }
 }

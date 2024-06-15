@@ -4,7 +4,7 @@ import { voeResolve } from "../../embeds/voe";
 import { uqloadResolve } from "../../embeds/uqload";
 import 'dotenv/config'
 
-const remote = process.env.remotely_hosted
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://frembed.fun/"
 

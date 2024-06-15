@@ -1,5 +1,3 @@
-// this source requires an IMDB api key
-
 import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails, totalEpisodes } from "../../../functions/tmdb"
 
 import 'dotenv/config'
@@ -10,7 +8,7 @@ const tmdb_api_key = process.env.TMDB_API_KEY
 const baseurl = 'https://dramacool.com.pa'
 
 
-export async function scrapeDramacool(id, season, episode, media ? ) {
+export async function scrapeDramacool(id, season, episode, media? ) {
     let finalstreams = []
     if (tmdb_api_key == null || tmdb_api_key == '' && media == null) {
         console.warn('No TMDB API key provided, it is required for dramacool.')

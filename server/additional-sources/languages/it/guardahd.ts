@@ -6,7 +6,7 @@ import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
-const remote = process.env.remotely_hosted
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://guardahd.stream"
 

@@ -1,22 +1,49 @@
-// this file basically routes all config based requests
+// this file basically routes all config based requests, so any paths that have config data in em
 
 import { defineEventHandler, sendRedirect } from 'h3';
-import { scrapeCustomProviders } from '../additional-sources/languages/id-based-scraper';
+import { scrapeCustomProviders } from '../additional-sources/languages/custom-wrapper';
 import { getMovieMediaDetails, getShowMediaDetails } from '../functions/tmdb';
+
+export const manifest = {
+	"id": "com.stremify",
+	"version": "2.7.0",
+	"catalogs": [],
+	"resources": [
+		"stream"
+	],
+	"types": [
+		"movie",
+		"series"
+	],
+	"name": "Stremify",
+	"description": "A multi-server streaming addon.",
+	"idPrefixes": [
+		"tmdb:", "tt"
+	],
+	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
+	"behaviorHints":{
+		"configurable":true,
+		"configurationRequired":false
+	}
+}
+
 
 export default defineEventHandler(async (event) => {
   const url = new URL(event.req.url, `http://${event.req.headers.host}`);
-  console.log(url.href)
   if (url.toString().includes("config")) {
     return sendRedirect(event, '/');
   }
   const manifestMatch = url.pathname.match(/^\/([^\/]+)\/manifest\.json$/);
   if (manifestMatch) {
-    return sendRedirect(event, '/manifest.json');
+    event.res.setHeader('access-control-allow-origin', '*')
+
+    return manifest;
   }
 
   const streamMatch = url.pathname.match(/^\/([^\/]+)\/stream\/([^\/]+)\/([^\/]+)\.json$/);
   if (streamMatch) {
+    event.res.setHeader('access-control-allow-origin', '*')
+
     const [, config, type, idPath] = streamMatch;
     const decodedConfig = Buffer.from(config, 'base64').toString('utf-8');
     if (type == "movie") {

@@ -2,7 +2,7 @@
 import { evalResolver } from "../../embeds/evalResolver"
 import 'dotenv/config'
 
-const remote = process.env.remotely_hosted
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://cinehdplus.cam"
 

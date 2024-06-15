@@ -1,57 +1,32 @@
 import { getMovieMediaDetails, convertImdbIdToTmdbId } from "../../../functions/tmdb";
-import { getMedia } from "../../../functions/providers";
-import { scrapeCustom } from "../../../additional-sources/languages/language-scraper";
-import 'dotenv/config'
-const scrape_english = process.env.scrape_english
-const sources = ["showbox", "vidsrc", "vidsrcto"] // the other sources seemingly do not work - either with Stremio or as a whole, please open up a PR or an issue if you have any idea why as I was not able to figure it out
+import { scrapeBuiltIn } from "~/functions/built_in_wrapper";
+import { convertResult } from "~/functions/stream_info_conversion";
 
+import 'dotenv/config'
+const scrape_built_in = process.env.scrape_built_in
 
 export default eventHandler(async (event) => {
-    const output: any = {
-        streams: []
-    };
+    let finalStreams: any = { streams: [] };
 
+    if (scrape_built_in == "false") { return(finalStreams); }
+    
     const path = getRouterParam(event, 'id')
     const id = path.split('.')[0];
 
-    if (scrape_english == "true") {
-        let tmdb
-        if (id.startsWith('tmdb') == true) {
-            tmdb = id.replace('tmdb:', '')
-        } else {
-            tmdb = await convertImdbIdToTmdbId(id)
-        }
-        const media = await getMovieMediaDetails(tmdb)
+    let tmdb
+    if (id.startsWith('tmdb') == true) {
+        tmdb = id.replace('tmdb:', '')
+    } else {
+        tmdb = await convertImdbIdToTmdbId(id)
+    }
+    
+    const media = await getMovieMediaDetails(tmdb)
 
-        for (const source of sources) {
-            const stream = await getMedia(media, source)
-            for (const embed in stream) {
-                const streams = stream[embed].stream;
-                for (const streamItem of streams) {
-                    if (streamItem.type === "file") {
-                        for (const qualityKey in streamItem.qualities) {
-                            const quality = streamItem.qualities[qualityKey];
-                            output.streams.push({
-                                name: "Stremify",
-                                type: "url",
-                                url: quality.url,
-                                title: `${source} - ${qualityKey}p (${embed})`
-                            });
-                        }
-                    } else if (streamItem.type == "hls") {
-                        output.streams.push({
-                            name: "Stremify",
-                            type: "url",
-                            url: streamItem.playlist,
-                            title: `${source} - auto (${embed})`
-                        })
-                    }
-                }
-            }
+    const output = await scrapeBuiltIn(media)
 
-
-        }
+    for (const result of output) {
+        finalStreams.streams.push(await convertResult(result))
     }
 
-    return output;
+    return(finalStreams)
 });
