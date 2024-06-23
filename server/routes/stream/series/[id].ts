@@ -1,6 +1,8 @@
 import { getShowMediaDetails, convertImdbIdToTmdbId } from "../../../functions/tmdb";
 import { scrapeBuiltIn } from "~/functions/built_in_wrapper";
 import { convertResult } from "~/functions/stream_info_conversion";
+import { getCache, setCache } from "~/functions/caching";
+
 import 'dotenv/config'
 const scrape_built_in = process.env.scrape_built_in
 
@@ -31,6 +33,9 @@ export default eventHandler(async (event) => {
         tmdb = await convertImdbIdToTmdbId(id.split(':')[0])
     }
 
+    const cache = await getCache('built-in', tmdb, mediaInfo.season, mediaInfo.episode)
+    if (cache) { return(cache) }
+
     const media = await getShowMediaDetails(tmdb, mediaInfo.season, mediaInfo.episode)
   
     const output = await scrapeBuiltIn(media)
@@ -38,6 +43,8 @@ export default eventHandler(async (event) => {
     for (const result of output) {
         finalStreams.streams.push(await convertResult(result))
     }
+
+    await setCache(finalStreams, 'built-in', tmdb, mediaInfo.season, mediaInfo.episode)
 
     return(finalStreams)
 });

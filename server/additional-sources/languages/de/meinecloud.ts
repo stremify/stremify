@@ -11,14 +11,12 @@ const remote = process.env.disable_same_ip_embeds
 const baseurl = "https://meinecloud.click/"
 
 export async function scrapeMeinecloud(imdbid) {
-  console.log(`${baseurl}/movie/${imdbid}`)
     const finalstreams = []
     const url = `${baseurl}/movie/${imdbid}`;
 
     try {
       const response = await fetch(url);
       if (!response.ok) {
-        console.log('tsk')
         return(null)
       }
       const text = await response.text();

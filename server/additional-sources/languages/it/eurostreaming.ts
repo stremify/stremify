@@ -36,6 +36,7 @@ export async function scrapeEurostreaming(imdb, season, episode) {
           const episodeData = await episodeFetch.text()
 
           if (remote != "true") {
+            /*
             const droploadregex = new RegExp(`${season}x${episode} Episodio ${episode} – .*\n&nbsp; <a href="([^"]+)">Dropload`);
 
             const droploadmatch = droploadregex.exec(episodeData);
@@ -53,7 +54,7 @@ export async function scrapeEurostreaming(imdb, season, episode) {
                       }
                   }
               )
-            }
+            }*/
           }
 
           const supervideoregex = new RegExp(`${season}x${episode} Episodio ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);

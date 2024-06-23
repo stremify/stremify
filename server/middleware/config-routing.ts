@@ -1,4 +1,4 @@
-// this file basically routes all config based requests, so any paths that have config data in em
+// this file basically routes all config based requests, so any paths that have config data in them
 
 import { defineEventHandler, sendRedirect } from 'h3';
 import { scrapeCustomProviders } from '../additional-sources/languages/custom-wrapper';

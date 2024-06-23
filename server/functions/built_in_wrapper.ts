@@ -1,14 +1,18 @@
-import { EmbedOutput, SourcererOutput, getBuiltinSources, targets, makeProviders, makeStandardFetcher } from "@movie-web/providers"
+import { SourcererOutput, getBuiltinSources, targets, makeProviders, makeStandardFetcher } from "@movie-web/providers"
 import { makeWSFetcher } from "~/functions/fetch";
 
 let sources = []
+const disabled_sources = ["nsbx", "smashystream"]
 
-export async function scrapeBuiltIn(media, peerId?: string) {
+import 'dotenv/config'
+const timeoutTime = parseInt(process.env.provider_timeout) || 30000;
+
+
+export async function scrapeBuiltIn(media, clientId?: string) {
     const streams = []
-
     let fetcher;
-    if (peerId != null) {
-        fetcher = makeWSFetcher(peerId)
+    if (clientId != null) {
+        fetcher = makeWSFetcher(clientId)
     } else {
         fetcher = globalThis.fetch;
     }
@@ -21,51 +25,70 @@ export async function scrapeBuiltIn(media, peerId?: string) {
         const builtInsSourceList = await getBuiltinSources()
 
         for (const source of builtInsSourceList) {
-            if (source.disabled != true) {
+            if (source.disabled != true && disabled_sources[source.id] == null) {
                 sources.push(source.id)
             }
         }    
     }
 
-    for (const source of sources) {
-        if (source == "nsbx") { continue; }
+    const promises = sources.map((source) => {
         try {
-            const sourceOutput: SourcererOutput = await scraper.runSourceScraper({
-                id: source,
-                media,
-            })
-
-            if (sourceOutput.stream) {
-                streams.push({
-                    source,
-                    stream: sourceOutput.stream,
-                })
-            } 
-            
-            if (sourceOutput.embeds) {
-                for (const embed of sourceOutput.embeds) {
+            return Promise.race([
+                (async () => {
                     try {
-                        const embedOutput = await scraper.runEmbedScraper({
-                            id: embed.embedId,
-                            url: embed.url,
+                        const sourceOutput: SourcererOutput = await scraper.runSourceScraper({
+                            id: source,
+                            media,
                         })
-                    
-                        if (embedOutput.stream) {
+            
+                        if (sourceOutput.stream) {
                             streams.push({
                                 source,
-                                embed: embed.embedId,
-                                stream: embedOutput.stream,
+                                stream: sourceOutput.stream,
                             })
+                        } 
+                        
+                        if (sourceOutput.embeds) {
+                            for (const embed of sourceOutput.embeds) {
+                                try {
+                                    const embedOutput = await scraper.runEmbedScraper({
+                                        id: embed.embedId,
+                                        url: embed.url,
+                                    })
+                                
+                                    if (embedOutput.stream) {
+                                        streams.push({
+                                            source,
+                                            embed: embed.embedId,
+                                            stream: embedOutput.stream,
+                                        })
+                                    }
+                                } catch(error) {
+                                    return null;
+                                }
+                            }
                         }
                     } catch(error) {
-                        continue;
+                        return null;
                     }
-                }
-            }
-        } catch(error) {
-            continue;
+                })(),
+                timeout(timeoutTime)
+            ])
+        } catch {
+            return null;
         }
-    }
+
+    })
+
+    await Promise.all(promises)
 
     return streams;
+}
+
+export function timeout(ms) {
+    return new Promise((reject) => {
+        setTimeout(() => {
+            reject(new Error("timed out"));
+        }, ms);
+    });
 }

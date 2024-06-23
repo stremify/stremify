@@ -41,6 +41,7 @@ export async function scrapeVerdahd(imdbid) {
             }
 
             if (remote != "true") {
+                /*
                 while ((match = droploadregex.exec(stringedcontent)) !== null) {
                     const embedurl = `https://${match[0]}`
                     const url = await evalResolver(new URL(embedurl))
@@ -50,7 +51,7 @@ export async function scrapeVerdahd(imdbid) {
                         url: url,
                         title: `Verhdlink ${lang} - auto (dropload.io)`
                     })
-                }
+                }*/
     
                 while ((match = streamtaperegex.exec(stringedcontent)) !== null) {
                     const initialurl: string = await streamtapeResolve(match[0])

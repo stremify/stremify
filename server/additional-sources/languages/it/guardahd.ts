@@ -30,6 +30,7 @@ export async function scrapeGuardahd(imdbid) {
 
       let match;
       if (remote != "true") {
+        /*
         while ((match = droploadregex.exec(text)) !== null) {
           const embedurl = `https://${match[0]}`        
           const url = await evalResolver(new URL(embedurl))
@@ -39,7 +40,7 @@ export async function scrapeGuardahd(imdbid) {
                   url: url,
                   title: `GuardaHD - auto (dropload.io)`
               })
-        }
+        }*/
     
         while ((match = streamtaperegex.exec(text)) !== null) {
           const initialurl = await streamtapeResolve(match[0])

@@ -9,7 +9,6 @@ export async function evalResolver(link: URL) {
         redirect: 'follow'
     });
     if (!response.ok) {
-        console.log('a')
         return(null)
     }
 

@@ -147,7 +147,6 @@ export async function makeTMDBRequest(url: string, appendToResponse?: string): P
         if (results.length) {
             return results[0].id;
         } else {
-            console.log(`No results found for the provided IMDb ID - ${imdbId}`);
             return null;
         }
     } catch (error) {
@@ -193,15 +192,12 @@ export async function totalEpisodes(tmdbId, season, episode) {
 }
 
 export async function getEpisodeIMDbID(tmdb, season, episode): Promise<{ imdb_id: string | null }> {
-  console.log(tmdb, season, episode)
   const url = `https://api.themoviedb.org/3/tv/${tmdb}/season/${season}/episode/${episode}/external_ids`;
 
   try {
     const response = await makeTMDBRequest(url);
 
     const jsonResponse = await response.json();
-
-    console.log(jsonResponse)
 
     const imdbId = jsonResponse.imdb_id ? jsonResponse.imdb_id : null;
 

@@ -13,7 +13,6 @@ export async function scrapeMyfilestorage(id, season, episode) {
             tmdb=id
         }
         const mediaURL = `${baseurl}/${tmdb}.mp4`
-        console.log(mediaURL)
 
         const mediaHEAD = await fetch(mediaURL, {
             method: 'HEAD',

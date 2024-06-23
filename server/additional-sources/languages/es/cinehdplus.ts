@@ -38,7 +38,7 @@ export async function scrapeCinehdplus(imdb, season, episode) {
 
       const episodeData = await episodeFetch.text()
 
-      if (remote != "true") {
+      /*if (remote != "true") {
         const droploadregex = new RegExp(`data-num="${season}x${episode}".*?data-link="(https://dropload\\.io/embed-\\w+\\.html)"`, 's'); // not the greatest way to do it, but it works ig
 
         const droploadmatch = droploadregex.exec(episodeData);
@@ -55,7 +55,7 @@ export async function scrapeCinehdplus(imdb, season, episode) {
                 }
             })
         }
-      }
+      }*/
 
       const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);
 

@@ -71,7 +71,6 @@ export async function scrapeKinokiste(imdb, season, episode) {
             )
           }
 
-          console.log(finalstreams)
           return(finalstreams)
 
     } catch(error) {

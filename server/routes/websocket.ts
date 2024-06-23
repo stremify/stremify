@@ -1,5 +1,10 @@
+// massive props to CrossWS for being well documented
+
 const peers = new Map();
 const responseHandlers = new Map();
+
+import 'dotenv/config'
+const disable_websocket_proxy = process.env.disable_websocket_proxy;
 
 export default defineWebSocketHandler({
   message(peer, messageContent) {
@@ -42,6 +47,7 @@ export default defineWebSocketHandler({
 });
 
 function handleRegister(peer, msg) {
+  if (disable_websocket_proxy == "true") { peer.close() }
   const peerId = msg.peerId;
   if (peers.has(peerId)) {
     peer.send(JSON.stringify({ type: 'error', message: 'ID already connected' }));
