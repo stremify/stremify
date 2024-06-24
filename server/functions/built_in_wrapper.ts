@@ -5,7 +5,7 @@ let sources = []
 const disabled_sources = ["nsbx", "smashystream"]
 
 import 'dotenv/config'
-const timeoutTime = parseInt(process.env.provider_timeout) || 30000;
+const timeoutTime = parseInt(process.env.provider_timeout) || 10000;
 
 
 export async function scrapeBuiltIn(media, clientId?: string) {

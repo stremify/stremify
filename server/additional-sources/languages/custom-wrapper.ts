@@ -15,7 +15,7 @@ import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from
 import 'dotenv/config'
 import { getCache, setCache } from "~/functions/caching";
 const disabled_providers = process.env.disabled_custom_providers || '';
-const timeoutTime = parseInt(process.env.provider_timeout) || 30000;
+const timeoutTime = parseInt(process.env.provider_timeout) || 10000;
 const scrape_custom_providers = process.env.scrape_custom_providers || 'true';
 const scrape_built_in = process.env.scrape_built_in || 'false';
 
