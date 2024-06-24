@@ -17,7 +17,7 @@ import { getCache, setCache } from "~/functions/caching";
 const disabled_providers = process.env.disabled_custom_providers || '';
 const timeoutTime = parseInt(process.env.provider_timeout) || 10000;
 const scrape_custom_providers = process.env.scrape_custom_providers || 'true';
-const scrape_built_in = process.env.scrape_built_in || 'false';
+const scrape_built_in = process.env.scrape_built_in || 'true';
 
 const movies: Map<string, (imdbid: string, media?: any) => Promise<any>> = new Map([
     ["frembed", async (imdbid: string) => await scrapeFrembed(imdbid, 0, 0)],

@@ -5,7 +5,7 @@ import 'dotenv/config'
 
 const remote = process.env.disable_same_ip_embeds
 
-const baseurl = "https://eurostreaming.forum/"
+const baseurl = "https://eurostreaming.money/"
 
 export async function scrapeEurostreaming(imdb, season, episode) {
     const finalstreams = []

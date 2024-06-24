@@ -3,8 +3,8 @@ import { CacheContainer } from 'node-ts-cache'
 import { MemoryStorage } from 'node-ts-cache-storage-memory'
 
 
-const cacheToggle = process.env.cache || 'false'
-const cacheTime = parseInt(process.env.cache_time) || 21600
+const cacheToggle = process.env.cache || 'true'
+const cacheTime = parseInt(process.env.cache_time) || 10800
 
 const cache = new CacheContainer(new MemoryStorage());
 
