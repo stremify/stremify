@@ -8,7 +8,7 @@ import 'dotenv/config'
 
 const remote = process.env.disable_same_ip_embeds
 
-const baseurl = "https://guardahd.stream"
+const baseurl = "https://mostraguarda.stream/"
 
 export async function scrapeGuardahd(imdbid) {
     const finalstreams = []
