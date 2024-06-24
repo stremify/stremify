@@ -6,10 +6,6 @@ const tmdb_api_key = process.env.TMDB_API_KEY
 
 export async function scrapeDramacool(id, season, episode, media?) {
     let finalstreams = []
-    if (tmdb_api_key == null || tmdb_api_key == '' && media == null) {
-        console.warn('No TMDB API key provided, it is required for dramacool.')
-        return ([])
-    }
 
     if (media == null) {
         if (id.includes('tt') == true) {
