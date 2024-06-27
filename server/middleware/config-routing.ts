@@ -18,7 +18,7 @@ export const manifest = {
 	"name": "Stremify",
 	"description": "A multi-server streaming addon.",
 	"idPrefixes": [
-		"tmdb:", "tt", "kitsu:"
+		"tmdb:", "tt"
 	],
 	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
 	"behaviorHints":{
@@ -27,6 +27,7 @@ export const manifest = {
 	}
 }
 
+manifest.idPrefixes.push('kitsu:')
 
 export default defineEventHandler(async (event) => {
   const url = new URL(event.req.url, `http://${event.req.headers.host}`);
