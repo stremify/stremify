@@ -18,7 +18,7 @@ export const manifest = {
 	"name": "Stremify",
 	"description": "A multi-server streaming addon.",
 	"idPrefixes": [
-		"tmdb:", "tt"
+		"tmdb:", "tt", "kitsu:"
 	],
 	"logo": "https://i.ibb.co/GWB1pwy/160156210.png",
 	"behaviorHints":{
@@ -69,6 +69,9 @@ export default defineEventHandler(async (event) => {
             episode: id.split(':')[3]
           }
           const mediaData = await scrapeCustomProviders(decodedConfig, mediaInfo.imdbid, mediaInfo.season, mediaInfo.episode, media)
+          event.res.end(JSON.stringify(mediaData))
+        } else if (id.includes('kitsu')) {
+          const mediaData = await scrapeCustomProviders(decodedConfig, `kitsu:${id.split(':')[1]}`, null, id.split(':')[2])
           event.res.end(JSON.stringify(mediaData))
         } else {
           mediaInfo = {

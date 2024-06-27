@@ -7,13 +7,14 @@ import { scrapeVerdahd } from './es/verhdlink';
 import { scrapeCinehdplus } from './es/cinehdplus';
 import { scrapeFrenchcloud } from "./fr/frenchcloud";
 import { scrapeDramacool } from "./multilang/dramacool";
-import { scrapeBuiltIn, timeout } from "~/functions/built_in_wrapper";
-import { convertResult } from "~/functions/stream_info_conversion";
-import { scrapeSmashystreamLang } from "./multilang/smashystream";
-import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from "../../functions/tmdb";
+import { scrapeSmashystreamLang } from "./multilang/smashystream"
+import { scrapeGogoanime } from "./multilang/gogoanime";
+import { scrapeBuiltinMovie } from "~/routes/stream/movie/[id]";
+import { scrapeBuiltinSeries } from "~/routes/stream/series/[id]";;
 
 import 'dotenv/config'
 import { getCache, setCache } from "~/functions/caching";
+import { timeout } from "~/functions/built_in_wrapper";
 const disabled_providers = process.env.disabled_custom_providers || '';
 const timeoutTime = parseInt(process.env.provider_timeout) || 10000;
 const scrape_custom_providers = process.env.scrape_custom_providers || 'true';
@@ -38,6 +39,7 @@ const series = new Map<string, (imdbid: string, season: string, episode: string,
     ["dramacool", async (imdbid: string, season: string, episode: string, media?: any) => await scrapeDramacool(imdbid, season, episode, media)],
     ["smashystreamtr", async (imdbid: string, season: string, episode: string) => await scrapeSmashystreamLang(imdbid, season, episode, "Turkish")],
     ["smashystreamhi", async (imdbid: string, season: string, episode: string) => await scrapeSmashystreamLang(imdbid, season, episode, "Hindi")],
+    ["gogoanime", async (id: string, season: string, episode: string, media?: any) => await scrapeGogoanime(id, season, episode, media)],
     //["goquick", async (imdbid: string, season: string, episode: string) => await scrapeGoquick(imdbid, season, episode)],
 ]);
 
@@ -53,6 +55,7 @@ const info = new Map<string, any>([
     ["smashystreamtr", {name: "Smashystream TR", lang_emoji: "🇹🇷"}],
     ["smashystreamhi", {name: "Smashystream HI", lang_emoji: "🇮🇳"}],
     ["dramacool", {name: "DramaCool", lang_emoji: "🎭"}],
+    ["gogoanime", {name: "Gogoanime", lang_emoji: "🌸"}],
     //["myfilestorage", {name: "Myfilestorage", lang_emoji: "🎥"}],
     //["goquick", {name: "GoQuick", lang_emoji: "🎥"}],
     //["moviesapi", {name: "MoviesAPI", lang_emoji: "🎥"}],
@@ -64,33 +67,14 @@ export async function scrapeCustomProviders(list, id, season, episode, media ? )
     };
     let sourcelist: string[] = list.split(',')
     if (list.includes("built-in") && scrape_built_in == "true") {
-        // built in is taken out of the promise loop, becuase it shouldn't be timed out
-        let tmdb;
-        if (media == null) {
-            if (id.startsWith('tmdb') == true) {
-                tmdb = id.split(':')[1]
-            } else {
-                tmdb = await convertImdbIdToTmdbId(id)
-                if (tmdb != null) {
-                    const builtinOutput = await scrapeBuiltIn(media)
+        try {
+            const streams = episode === 0 ? await scrapeBuiltinMovie(id) : await scrapeBuiltinSeries(`${id}:${season}:${episode}`)
 
-                    for (const result of builtinOutput) {
-                        output.streams.push(await convertResult(result))
-                    }
-                }
+            for (const stream of streams) {
+                output.streams.push(stream)
             }
-            const cached = episode === 0 ? await getCache('built-in', tmdb) : await getCache('built-in', tmdb, season, episode);
-            if (cached) { return cached; }
-            try {
-                media = episode === 0 ? await getMovieMediaDetails(tmdb) : await getShowMediaDetails(tmdb, season, episode) 
-                if (media != null) {
-                    const builtinOutput = await scrapeBuiltIn(media)
-
-                    for (const result of builtinOutput) {
-                        output.streams.push(await convertResult(result))
-                    }
-                }
-            } catch {}
+        } catch(err) {
+            console.log(err)
         }
     }
     const promises = sourcelist.map(async (source) => {

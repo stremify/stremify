@@ -1,10 +1,11 @@
 import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails, totalEpisodes } from "../../../functions/tmdb"
-import { MOVIES } from "@consumet/extensions"
+import { getKitsuMediaDetails } from "~/functions/kitsu"
+import { ANIME } from "@consumet/extensions"
 
 import 'dotenv/config'
 const tmdb_api_key = process.env.TMDB_API_KEY
 
-export async function scrapeDramacool(id, season, episode, media?) {
+export async function scrapeGogoanime(id, season, episode, media?) { 
     episode = parseInt(episode)
     let finalstreams = []
 
@@ -18,44 +19,44 @@ export async function scrapeDramacool(id, season, episode, media?) {
             if (media == null) {
                 return([])
             }
-        } else if (id.includes('tmdb')) {
-            media = episode === 0 ? await getMovieMediaDetails(id) : getShowMediaDetails(id, season, episode)
-            if (media == null) {
-                return([])
-            }
-        } else {
-            return ([])
+        } else if (id.includes('kitsu')) {
+            media = await getKitsuMediaDetails(id.split(':')[1]);
+            console.log(media)
         }
     }
 
-    const dramacool = new MOVIES.DramaCool;
+    const gogoanime = new ANIME.Gogoanime;
 
-    const searchResults = (await dramacool.search(media.title)).results
+    const searchResults = (await gogoanime.search(media.title)).results
     
+    let i = 0;
     for (const searchResult of searchResults) {
+        if (i >= 3) { break; }
         let data;
 
         try {
-            data = await dramacool.fetchMediaInfo(searchResult.id)
+            data = await gogoanime.fetchAnimeInfo(searchResult.id)
         } catch(err) {
             continue;
         }
 
-        if (data.episodes[episode === 0 ? 0 : episode - 1]) {
-            const episodeSources = await dramacool.fetchEpisodeSources(data.episodes[episode === 0 ? 0 : episode - 1].id)
+        const episodeNum = episode - 1
+        if (data.episodes[episodeNum]) {
+            const episodeSources = await gogoanime.fetchEpisodeSources(data.episodes[episodeNum].id)
             
             for (const result of episodeSources.sources) {
                 finalstreams.push({
                     name: "Stremify",
                     type: "url",
                     url: result.url,
-                    title: `DramaCool - ${searchResult.title} E${episode}`,
+                    title: `Gogoanime - ${searchResult.title} E${episode} ${result.quality}`,
                     behaviorHints: {
-                        bingeGroup: `dramacool_${encodeURIComponent(searchResult.title.toString())}`
+                        bingeGroup: `gogoanime_${encodeURIComponent(searchResult.title.toString())}`
                     }
                 })
             }
         }
+        i++;
     }
 
     return(finalstreams)

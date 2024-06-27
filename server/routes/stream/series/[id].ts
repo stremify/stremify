@@ -8,14 +8,18 @@ const scrape_built_in = process.env.scrape_built_in
 
   
 export default eventHandler(async (event) => {
-    let finalStreams: any = { streams: [] };
 
-    if (scrape_built_in == "false") { return(finalStreams); }
+    if (scrape_built_in == "false") { return({streams: []}); }
     
     const path = getRouterParam(event, 'id')
     const decodedId = decodeURIComponent(path)
     const id = decodedId.split('.')[0];
 
+    return({streams:[await scrapeBuiltinSeries(id)]})
+});
+
+export async function scrapeBuiltinSeries(id) {
+    let finalStreams: any = [];
     let tmdb
     let mediaInfo = {season: '', episode: ''}
 
@@ -41,10 +45,10 @@ export default eventHandler(async (event) => {
     const output = await scrapeBuiltIn(media)
 
     for (const result of output) {
-        finalStreams.streams.push(await convertResult(result))
+        finalStreams.push(await convertResult(result))
     }
 
     await setCache(finalStreams, 'built-in', tmdb, mediaInfo.season, mediaInfo.episode)
 
     return(finalStreams)
-});
+}

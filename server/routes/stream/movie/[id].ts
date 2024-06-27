@@ -7,13 +7,17 @@ import 'dotenv/config'
 const scrape_built_in = process.env.scrape_built_in
 
 export default eventHandler(async (event) => {
-    let finalStreams: any = { streams: [] };
 
-    if (scrape_built_in == "false") { return(finalStreams); }
+    if (scrape_built_in == "false") { return({streams: []}); }
     
     const path = getRouterParam(event, 'id')
     const id = path.split('.')[0];
 
+    return({streams:[await scrapeBuiltinMovie(id)]})
+});
+
+export async function scrapeBuiltinMovie(id) {
+    let finalStreams: any = [];
     let tmdb
     if (id.startsWith('tmdb') == true) {
         tmdb = id.replace('tmdb:', '')
@@ -29,10 +33,10 @@ export default eventHandler(async (event) => {
     const output = await scrapeBuiltIn(media)
 
     for (const result of output) {
-        finalStreams.streams.push(await convertResult(result))
+        finalStreams.push(await convertResult(result))
     }
 
     await setCache(finalStreams, 'built-in', tmdb)
 
     return(finalStreams)
-});
+}
