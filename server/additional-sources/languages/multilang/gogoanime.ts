@@ -21,7 +21,6 @@ export async function scrapeGogoanime(id, season, episode, media?) {
             }
         } else if (id.includes('kitsu')) {
             media = await getKitsuMediaDetails(id.split(':')[1]);
-            console.log(media)
         }
     }
 
