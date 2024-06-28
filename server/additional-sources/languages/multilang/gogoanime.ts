@@ -60,3 +60,105 @@ export async function scrapeGogoanime(id, season, episode, media?) {
 
     return(finalstreams)
 }
+
+export async function searchGogoanime(query: string) {
+    const finalLinks = {"metas": []}
+
+    const dramacool = new ANIME.Gogoanime;
+
+    const searchResults = await dramacool.search(query);
+
+    for (const searchResult of searchResults.results) {
+        finalLinks.metas.push({
+            'id': `${gogoanimePrefix}${btoa(searchResult.id)}`,
+            'type': 'series',
+            'name': searchResult.title,
+            'poster': searchResult.image
+        })
+    }
+
+    return(finalLinks)
+}
+
+export async function scrapefromGogoanimeCatalog(id) {
+    if (id.startsWith(gogoanimePrefix) != true) { return [] }
+    let finalstreams = []
+
+    const dramacool = new ANIME.Gogoanime;
+
+    const episodeId = atob(id.split(':')[1])
+
+    const episodeSources = await dramacool.fetchEpisodeSources(episodeId)
+            
+    for (const result of episodeSources.sources) {
+        finalstreams.push({
+            name: "Stremify",
+            type: "url",
+            url: result.url,
+            title: `Gogoanime`,
+            behaviorHints: {
+                bingeGroup: `gogoanime`
+            }
+        })
+    }
+
+    return(finalstreams)
+}
+
+
+export async function gogoanimeMeta(id: string, type: 'movie' | 'series') {
+    console.log(id)
+    if (id.includes(gogoanimePrefix) != true) { return [] }
+    const elemId = atob(id.split(':')[1])
+    
+    const gogoanime = new ANIME.Gogoanime;
+
+    const gogoanimeMediaInfo = await gogoanime.fetchAnimeInfo(elemId);
+
+    const videos = []
+
+    let i = 1;
+
+    for (const episode of gogoanimeMediaInfo.episodes) {
+        videos.push({
+            "season": 1,
+            "episode": episode.number || i,
+            "id": `${gogoanimePrefix}${btoa(episode.id)}`,
+            "title": episode.title || `Episode ${i}`,
+            "thumbnail": episode.image,
+            "overview": episode.description,
+        })
+        i++;
+    }
+
+    if (gogoanimeMediaInfo) {
+        return({
+            'meta': {
+                id,
+                type,
+                name: gogoanimeMediaInfo.title,
+                description: gogoanimeMediaInfo.description,
+                releaseInfo: gogoanimeMediaInfo.releaseDate,
+                poster: gogoanimeMediaInfo.image,
+                background: gogoanimeMediaInfo.image,
+                genres: gogoanimeMediaInfo.genres,
+                cast: gogoanimeMediaInfo.casts,
+                videos,
+            }
+        })
+    }
+}
+
+export const gogoanimePrefix = "stremify_gogoanime:"
+
+export const gogoanime_catalog = [
+    {
+        "id": "gogoanime",
+        "type": "series",
+        "name": "Gogoanime",
+        "idPrefixes": [gogoanimePrefix],
+        "extra": [
+            { "name": "search", "isRequired": true }
+        ]
+    }
+]

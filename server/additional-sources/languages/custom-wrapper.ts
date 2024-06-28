@@ -8,10 +8,9 @@ import { scrapeCinehdplus } from './es/cinehdplus';
 import { scrapeFrenchcloud } from "./fr/frenchcloud";
 import { dramacoolMeta, dramacoolPrefix, dramacool_catalog, scrapeDramacool, scrapefromDramacoolCatalog, searchDramacool } from "./multilang/dramacool";
 import { scrapeSmashystreamLang } from "./multilang/smashystream"
-import { scrapeGogoanime } from "./multilang/gogoanime";
+import { gogoanimeMeta, gogoanimePrefix, gogoanime_catalog, scrapeGogoanime, scrapefromGogoanimeCatalog, searchGogoanime } from "./multilang/gogoanime";
 import { scrapeBuiltinMovie } from "~/routes/stream/movie/[id]";
 import { scrapeBuiltinSeries } from "~/routes/stream/series/[id]";;
-
 import { searchWecima, weCimaPrefix, getWecimaMeta, wecimaCatalogs } from "./ar/wecima";
 
 import 'dotenv/config'
@@ -45,6 +44,7 @@ const series = new Map<string, (imdbid: string, season: string, episode: string,
     ["smashystreamhi", async (imdbid: string, season: string, episode: string) => await scrapeSmashystreamLang(imdbid, season, episode, "Hindi")],
     ["gogoanime", async (id: string, season: string, episode: string, media?: any) => await scrapeGogoanime(id, season, episode, media)],
     ["dramacool_catalog", async (id: string) => await scrapefromDramacoolCatalog(id)],
+    ["gogoanime_catalog", async (id: string) => await scrapefromGogoanimeCatalog(id)],
     //["goquick", async (imdbid: string, season: string, episode: string) => await scrapeGoquick(imdbid, season, episode)],
 ]);
 
@@ -62,6 +62,7 @@ const info = new Map<string, any>([
     ["dramacool", {name: "DramaCool (TMDB/IMDB)", lang_emoji: "🎭"}],
     ["dramacool_catalog", {name: "DramaCool (Catalog Resolver)", lang_emoji: "🎭"}],
     ["gogoanime", {name: "GogoAnime (Kitsu)", lang_emoji: "🌸"}],
+    ["gogoanime_catalog", {name: "GogoAnime (Catalog Resolver)", lang_emoji: "🌸"}],
     //["wecima", {name: "WeCima (Catalog Resolver)", lang_emoji: "🇸🇦"}]
     //["myfilestorage", {name: "Myfilestorage", lang_emoji: "🎥"}],
     //["goquick", {name: "GoQuick", lang_emoji: "🎥"}],
@@ -70,17 +71,20 @@ const info = new Map<string, any>([
 
 export const catalogSearchFunctions = new Map<string, any>([
     ["wecima", async (query: string, mediaType: 'movie' | 'series') => await searchWecima(query, mediaType)],
-    ["dramacool_catalog", async (query: string, mediaType: 'movie' | 'series') => await searchDramacool(query)],
+    ["dramacool_catalog", async (query: string) => await searchDramacool(query)],
+    ["gogoanime_catalog", async (query: string) => await searchGogoanime(query)],
 ]);
 
 export const catalogMetaFunctions = new Map<string, any>([
     ["wecima", async (id: string, mediaType: 'movie' | 'series') => await getWecimaMeta(id, mediaType)],
     ["dramacool_catalog", async (query: string, mediaType: 'movie' | 'series') => await dramacoolMeta(query, mediaType)],
+    ["gogoanime_catalog", async (query: string, mediaType: 'movie' | 'series') => await gogoanimeMeta(query, mediaType)],
 ]);
 
 export const catalogManifests = new Map<string, any>([
     ["wecima", {catalogs: wecimaCatalogs, prefix: weCimaPrefix}],
     ["dramacool_catalog", {catalogs: dramacool_catalog, prefix: dramacoolPrefix}],
+    ["gogoanime_catalog", {catalogs: gogoanime_catalog, prefix: gogoanimePrefix}]
 ]);
 
 export async function scrapeCustomProviders(list, id, season, episode, media? ) {
@@ -204,8 +208,9 @@ export async function handleSearch(query, queriedCatalog, type) {
 
 export async function handleMeta(metaid, type) {
     for (const [key, value] of catalogMetaFunctions.entries()) {
-        const meta = value(metaid, type)
-        if (meta) {
+        console.log(key)
+        const meta = await value(metaid, type)
+        if (meta && meta.length != 0) {
             return(meta)
         }
     }
