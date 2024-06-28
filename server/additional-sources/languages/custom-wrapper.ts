@@ -208,7 +208,6 @@ export async function handleSearch(query, queriedCatalog, type) {
 
 export async function handleMeta(metaid, type) {
     for (const [key, value] of catalogMetaFunctions.entries()) {
-        console.log(key)
         const meta = await value(metaid, type)
         if (meta && meta.length != 0) {
             return(meta)

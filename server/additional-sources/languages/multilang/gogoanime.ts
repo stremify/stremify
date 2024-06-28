@@ -64,9 +64,9 @@ export async function scrapeGogoanime(id, season, episode, media?) {
 export async function searchGogoanime(query: string) {
     const finalLinks = {"metas": []}
 
-    const dramacool = new ANIME.Gogoanime;
+    const gogoanime = new ANIME.Gogoanime;
 
-    const searchResults = await dramacool.search(query);
+    const searchResults = await gogoanime.search(query);
 
     for (const searchResult of searchResults.results) {
         finalLinks.metas.push({
@@ -84,11 +84,11 @@ export async function scrapefromGogoanimeCatalog(id) {
     if (id.startsWith(gogoanimePrefix) != true) { return [] }
     let finalstreams = []
 
-    const dramacool = new ANIME.Gogoanime;
+    const gogoanime = new ANIME.Gogoanime;
 
     const episodeId = atob(id.split(':')[1])
 
-    const episodeSources = await dramacool.fetchEpisodeSources(episodeId)
+    const episodeSources = await gogoanime.fetchEpisodeSources(episodeId)
             
     for (const result of episodeSources.sources) {
         finalstreams.push({
@@ -107,7 +107,6 @@ export async function scrapefromGogoanimeCatalog(id) {
 
 
 export async function gogoanimeMeta(id: string, type: 'movie' | 'series') {
-    console.log(id)
     if (id.includes(gogoanimePrefix) != true) { return [] }
     const elemId = atob(id.split(':')[1])
     
