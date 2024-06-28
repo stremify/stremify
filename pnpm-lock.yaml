@@ -11,6 +11,9 @@ dependencies:
   '@movie-web/providers':
     specifier: github:sussy-code/providers
     version: github.com/sussy-code/providers/9152184b0045166b7aae927bf54f743d66630f2a
+  '@types/stremio-addon-sdk':
+    specifier: ^1.6.11
+    version: 1.6.11
   cheerio:
     specifier: 1.0.0-rc.12
     version: 1.0.0-rc.12
@@ -962,6 +965,10 @@ packages:
   /@types/resolve@1.20.2:
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
     dev: true
+
+  /@types/stremio-addon-sdk@1.6.11:
+    resolution: {integrity: sha512-y0nXwX2gqrWcVYLEvujxqLOm/yZoMu8nLyiw1MthgVuiPp6RVfgWqwpql71MUV5shSfPNsd7EtsiWw2cUFhcWQ==}
+    dev: false
 
   /@vercel/nft@0.26.5:
     resolution: {integrity: sha512-NHxohEqad6Ra/r4lGknO52uc/GrWILXAMs1BB4401GTqww0fw1bAqzpG1XHuDO+dprg4GvsD9ZLLSsdo78p9hQ==}

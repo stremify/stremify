@@ -12,6 +12,7 @@
   "dependencies": {
     "@consumet/extensions": "^1.6.0",
     "@movie-web/providers": "github:sussy-code/providers",
+    "@types/stremio-addon-sdk": "^1.6.11",
     "cheerio": "1.0.0-rc.12",
     "dotenv": "^16.4.5",
     "m3u8-parser": "^7.1.0",

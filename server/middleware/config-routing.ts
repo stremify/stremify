@@ -3,6 +3,7 @@
 import { defineEventHandler, sendRedirect } from 'h3';
 import { scrapeCustomProviders } from '../additional-sources/languages/custom-wrapper';
 import { getMovieMediaDetails, getShowMediaDetails } from '../functions/tmdb';
+import { buildManifest, handleSearch, handleMeta } from '../additional-sources/languages/custom-wrapper';
 
 export const manifest = {
 	"id": "com.stremify",
@@ -31,14 +32,31 @@ manifest.idPrefixes.push('kitsu:')
 
 export default defineEventHandler(async (event) => {
   const url = new URL(event.req.url, `http://${event.req.headers.host}`);
+
   if (url.toString().includes("config")) {
     return sendRedirect(event, '/');
   }
   const manifestMatch = url.pathname.match(/^\/([^\/]+)\/manifest\.json$/);
   if (manifestMatch) {
     event.res.setHeader('access-control-allow-origin', '*')
+    
+    
 
-    return manifest;
+    return await buildManifest(JSON.stringify(manifest), atob(manifestMatch[1]));
+  }
+
+  const catalogMatch = url.pathname.match(/^\/([^\/]+)\/catalog\/([^/]*)\/([^/]*)\/search=([^.]*).json/)
+  if (catalogMatch) {
+    event.res.setHeader('access-control-allow-origin', '*')
+    const searchData = await handleSearch(decodeURIComponent(catalogMatch[4]), catalogMatch[3], catalogMatch[2])
+    event.res.end(JSON.stringify(searchData))
+  }
+
+  const metaMatch = url.pathname.match(/^\/([^\/]+)\/meta\/([^/]*)\/([^/]*).json/)
+  if (metaMatch) {
+    event.res.setHeader('access-control-allow-origin', '*')
+    const metaData = await handleMeta(decodeURIComponent(metaMatch[3]), metaMatch[2])
+    event.res.end(JSON.stringify(metaData))
   }
 
   const streamMatch = url.pathname.match(/^\/([^\/]+)\/stream\/([^\/]+)\/([^\/]+)\.json$/);
@@ -74,13 +92,16 @@ export default defineEventHandler(async (event) => {
         } else if (id.includes('kitsu')) {
           const mediaData = await scrapeCustomProviders(decodedConfig, `kitsu:${id.split(':')[1]}`, null, id.split(':')[2])
           event.res.end(JSON.stringify(mediaData))
-        } else {
+        } else if (id.startsWith('tt')) {
           mediaInfo = {
             imdbid: id.split(':')[0],
             season: id.split(':')[1],
             episode: id.split(':')[2]
           }
           const mediaData = await scrapeCustomProviders(decodedConfig, mediaInfo.imdbid, mediaInfo.season, mediaInfo.episode)
+          event.res.end(JSON.stringify(mediaData))
+        } else {
+          const mediaData = await scrapeCustomProviders(decodedConfig, id, null, null)
           event.res.end(JSON.stringify(mediaData))
         }
     }
