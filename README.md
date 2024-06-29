@@ -10,7 +10,7 @@ V2.7 env variables:
 
 ``TMDB_API_KEY: ""``
 
-``scrape_built_in: "true/false" ``(defaults to false, this is for the providers that are from the provider package)
+``scrape_built_in: "true/false" ``(defaults to true, this is for the providers that are from the provider package)
 
 ``scrape_custom_providers: "true/false"`` (defaults to true, disables non-provider package providers)
 
@@ -18,10 +18,10 @@ V2.7 env variables:
 
 ``disable_websocket_proxy:"true"`` (defaults to true, disables an in-development feature that allows the server to proxy requests from the user's IP, not yet finished though)
 
-``provider_timeout:"10000"`` (defaults to 30000, maximum amount of time a source will be waited on in ms, all sources run at the same time now so when the timeout time is reached any sources that hadn't finished yet will be marked as not having the media element and the plugin will return the response, 10000 should be the optimal amount of time for a public instance)
+``provider_timeout:"10000"`` (defaults to 10000, maximum amount of time a source will be waited on in ms, all sources run at the same time now so when the timeout time is reached any sources that hadn't finished yet will be marked as not having the media element and the plugin will return the response_
 
 ``cache: "true/false" `` (enables built-in caching, false by default)
 
-``cache_time: "21600" ``(how long the cache is kept for, in seconds, defaults to 6 hrs)
+``cache_time: "10800" ``(how long the cache is kept for, in seconds, defaults to 3 hrs)
 
 ``disabled_providers=""`` (disables providers based off of their IDs, you can find a list of provider IDs [here](https://github.com/stremify/stremify/blob/v2.7/server/additional-sources/languages/custom-wrapper.ts)
