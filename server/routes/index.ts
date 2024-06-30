@@ -79,9 +79,6 @@ export default eventHandler(async (event) => {
       <button type="button" class="button" onclick="encodeSelection()">Get Link</button>
       <input type="text" id="base64-result" readonly></p>
       <a id="config-install-link" class="button">Install with configuration</a>
-      <hr>
-      <p style="color: grey;"><i>Made with ❤️, open source on <a href="https://github.com/stremify/stremify"
-            style="color: grey;">GitHub</a></i></p>
     </div>
     <script>
       function setPluginInstallLink() {

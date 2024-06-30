@@ -1,14 +1,25 @@
+import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from "~/functions/tmdb"
+
 const wecimaBase = "https://wecima.show"
 
-export async function scrapeWecima(id: string, season: string, episode: string) {
+export async function scrapeWecima(id: string, season: string, episode: string, media?) {
+    if (id.includes(weCimaPrefix) != true) { return [] }
+    const finalstreams = []
+
+    const type = episode === '0' ? 'movie' : 'series'
+    id = atob(id.split(':')[1]);
+
+    const streamPage = await fetch(id);
+    const streamPageData = await streamPage.text();
+
 
 }
 
-export async function searchWecima(query: string, mediaType) {
-    const finalLinks = {"metas": []}
+export async function searchWecima(query: string, mediaType): Promise<searchResponse> {
+    const finalLinks: searchResponse = {"metas": []}
     const searchPath = await fetch(`${wecimaBase}/AjaxCenter/Searching/${encodeURIComponent(query)}`)
     
-    if (searchPath.ok != true) { return [] }
+    if (searchPath.ok != true) { return finalLinks; }
 
     const searchData = (await searchPath.text()).replace(/\\/g, '');
 
@@ -31,7 +42,7 @@ export async function searchWecima(query: string, mediaType) {
 }
 
 export async function getWecimaMeta(id: string, type: 'movie' | 'series') {
-    if (id.includes('wecima') != true) { return [] }
+    if (id.includes(weCimaPrefix) != true) { return [] }
     const url = atob(id.split(':')[1])
     const pageData = await fetch(url)
     const data = await pageData.text()
@@ -39,18 +50,61 @@ export async function getWecimaMeta(id: string, type: 'movie' | 'series') {
     let description: any = data.match(/<div class=\"StoryMovieContent\">([^<]*)/)
     if (description && description[1]) { description = description[1] }
 
-    let imageURL: any = data.match(/data-lazy-style=\"--img:url\(([^\)]*)/)
+    let imageURL: any = data.match(/--img:url\(([^\)]*)/)
     if (imageURL && imageURL[1]) { imageURL = imageURL[1] }
 
-    let meta = data.match(/<h1 dir=\"auto\" itemprop=\"name\">([^\(]*)[^>]*>([^<]*)/)
+    let meta = data.match(/<h1 dir=\"auto\" itemprop=\"name\">([^\(]*)[^>]*>([^<]*)/) || data.match(/<h1>([^<]*)<a href=[^>]*>([^<]*)/)
     let name;
     let releaseInfo;
 
-    if (meta && meta[1] && meta[2]) { name = meta[1]; releaseInfo = meta[2]}
+    if (meta && meta[1] && meta[2]) { name = meta[1].replace('(', ''); releaseInfo = meta[2]}
 
     let videos = [];
     if (type == 'series') {
+        const episodePanelRegex = /<div class="Episodes--Seasons--Episodes">[^*]*ifr/
+        const episodePanelHTML = episodePanelRegex.exec(data)
 
+        const episodeRegex = /<a class="hoverable activable" href="([^"]*)"><div class="Thumb"><span><i class="fa fa-play"><\/i><\/span><\/div><episodeArea><episodeTitle>([^<]*)/gm
+
+        let episodeElem;
+        let episode = 1;
+        while ((episodeElem = episodeRegex.exec(episodePanelHTML[0])) != null) {
+            let episodeNumber = episodeElem[2].replace(/\D/g, '')
+            videos.push({
+                "season": 1,
+                "episode": parseInt(episodeNumber) || episode, 
+                "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
+                "title": episodeElem[2],
+            })
+            episode++;
+        };
+        const seasonsRegex = /<div class="List--Seasons--Episodes">[^*]*?<\/div>/
+        const seasonElement = seasonsRegex.exec(data)
+        const nonActiveSeasonRegex = /<a class="hoverable activable" href="([^"]*)">([^<]*)/gm
+        let match;
+        let season = 1;
+        while ((match = nonActiveSeasonRegex.exec(seasonElement[0])) != null) {
+            season++;
+            const seasonData = await fetch(match[1])
+            const seasonHTML = await seasonData.text()
+
+            const episodePanel = (/div class="Episodes--Seasons--Episodes">[^*]*--p/).exec(seasonHTML)
+            let episode = 1;
+            try {
+                while ((episodeElem = episodeRegex.exec(episodePanel[0])) != null) {
+                    let episodeNumber = episodeElem[2].replace(/\D/g, '')
+                    videos.push({
+                        "season": season,
+                        "episode": parseInt(episodeNumber) || episode,
+                        "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
+                        "title": episodeElem[2],
+                    })
+                    episode++;
+                };
+            } catch(err) {
+                console.log(err)
+            }
+        }
     }
     
     return({
@@ -94,4 +148,8 @@ function decode(str: string) {
     return str.replace(/\\u[\dA-F]{4}/gi, function (match) {
         return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
     });
+}
+
+interface searchResponse {
+    metas: any[]
 }

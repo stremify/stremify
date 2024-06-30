@@ -72,7 +72,7 @@ export default defineEventHandler(async (event) => {
           event.res.end(JSON.stringify(mediaData))
         } else {
           const id = idPath
-          const mediaData = await scrapeCustomProviders(decodedConfig, id, 0, 0)
+          const mediaData = await scrapeCustomProviders(decodedConfig, decodeURIComponent(id), 0, 0)
           event.res.end(JSON.stringify(mediaData))
         }
     } else if (type == "series") {
@@ -101,7 +101,7 @@ export default defineEventHandler(async (event) => {
           const mediaData = await scrapeCustomProviders(decodedConfig, mediaInfo.imdbid, mediaInfo.season, mediaInfo.episode)
           event.res.end(JSON.stringify(mediaData))
         } else {
-          const mediaData = await scrapeCustomProviders(decodedConfig, id, null, null)
+          const mediaData = await scrapeCustomProviders(decodedConfig, decodeURIComponent(id), null, null)
           event.res.end(JSON.stringify(mediaData))
         }
     }
