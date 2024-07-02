@@ -151,11 +151,6 @@ export async function visioncineMeta(id, type: 'movie' | 'series') {
     })
 }
 
-async function extractVisioncineEpisodes(id, season) {
-    
-
-}
-
 export const visioncinePrefix = "visioncine:"
 
 

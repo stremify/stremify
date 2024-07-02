@@ -7,7 +7,7 @@ import { scrapeVerdahd } from './es/verhdlink';
 import { scrapeCinehdplus } from './es/cinehdplus';
 import { scrapeFrenchcloud } from "./fr/frenchcloud";
 import { dramacoolMeta, dramacoolPrefix, dramacool_catalog, scrapeDramacool, scrapefromDramacoolCatalog, searchDramacool } from "./multilang/dramacool";
-import { scrapeSmashystreamLang } from "./multilang/smashystream"
+import { scrapeSmashystreamLang, scrapeSmashystreamOrg } from "./multilang/smashystream"
 import { gogoanimeMeta, gogoanimePrefix, gogoanime_catalog, scrapeGogoanime, scrapefromGogoanimeCatalog, searchGogoanime } from "./multilang/gogoanime";
 import { scrapeBuiltinMovie } from "~/routes/stream/movie/[id]";
 import { scrapeBuiltinSeries } from "~/routes/stream/series/[id]";;
@@ -34,6 +34,8 @@ const movies: Map<string, (imdbid: string, media?: any) => Promise<any>> = new M
     ["smashystreamhi", async (imdbid: string) => await scrapeSmashystreamLang(imdbid, '0', '0', "Hindi")],
     ["dramacool_catalog", async (id: string) => await scrapefromDramacoolCatalog(id)],
     ["visioncine", async (id) => await scrapeVisioncine(id)],
+    ["smashystream", async (imdbid: string) => await scrapeSmashystreamOrg(imdbid, '0', '0', 1)],
+    ["wecima", async (id: string) => await scrapeWecima(id)],
     //["goquick", async (imdbid: string) => await scrapeGoquick(imdbid, 0, 0)],
 ]);
 
@@ -48,8 +50,9 @@ const series = new Map<string, (imdbid: string, season: string, episode: string,
     ["gogoanime", async (id: string, season: string, episode: string, media?: any) => await scrapeGogoanime(id, season, episode, media)],
     ["dramacool_catalog", async (id: string) => await scrapefromDramacoolCatalog(id)],
     ["gogoanime_catalog", async (id: string) => await scrapefromGogoanimeCatalog(id)],
-    ["wecima", async (id: string, season: string, episode: string, media?: any) => await scrapeWecima(id, season, episode, media)],
+    ["wecima", async (id: string, season: string, episode: string, media?: any) => await scrapeWecima(id)],
     ["visioncine", async (id) => await scrapeVisioncine(id)],
+    ["smashystream", async (imdbid: string, season: string, episode: string) => await scrapeSmashystreamOrg(imdbid, season, episode, 1)],
     //["goquick", async (imdbid: string, season: string, episode: string) => await scrapeGoquick(imdbid, season, episode)],
 ]);
 
@@ -62,10 +65,11 @@ const info = new Map<string, any>([
     ["verhdlink", {name: "VerHDlink", lang_emoji: "🇪🇸🇲🇽"}],
     ["eurostreaming", {name: "EuroStreaming", lang_emoji: "🇮🇹"}],
     ["guardahd", {name: "GuardaHD", lang_emoji: "🇮🇹"}],
-    ["smashystreamtr", {name: "Smashystream TR", lang_emoji: "🇹🇷"}],
-    ["smashystreamhi", {name: "Smashystream HI", lang_emoji: "🇮🇳"}],
+    //["smashystreamtr", {name: "Smashystream TR", lang_emoji: "🇹🇷"}],
+    //["smashystreamhi", {name: "Smashystream HI", lang_emoji: "🇮🇳"}],
     ["visioncine", {name: "Visioncine (Catalog Resolver)", lang_emoji: "🇧🇷"}],
-    //["wecima", {name: "WeCima (Catalog Resolver)", lang_emoji: "🇸🇦"}],
+    ["wecima", {name: "WeCima (Catalog Resolver)", lang_emoji: "🇸🇦"}],
+    //["smashystream", {name: "Smashystream", lang_emoji: "🎥"}],
     ["dramacool", {name: "DramaCool (TMDB/IMDB)", lang_emoji: "🎭"}],
     ["dramacool_catalog", {name: "DramaCool (Catalog Resolver)", lang_emoji: "🎭"}],
     ["gogoanime", {name: "GogoAnime (Kitsu)", lang_emoji: "🌸"}],

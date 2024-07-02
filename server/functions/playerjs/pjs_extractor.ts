@@ -1,5 +1,6 @@
 import decode from "./decryption"
 import { VM } from "vm2"
+import { writeFile } from "fs"
 
 export async function pjsExtractor(configurl) {
     const scriptFetchData = await fetch(configurl)

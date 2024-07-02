@@ -1,18 +1,23 @@
+import { extractBuiltinEmbed } from "~/additional-sources/embeds/builtinEmbed"
 import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from "~/functions/tmdb"
 
 const wecimaBase = "https://wecima.show"
 
-export async function scrapeWecima(id: string, season: string, episode: string, media?) {
+export async function scrapeWecima(id: string) {
     if (id.includes(weCimaPrefix) != true) { return [] }
     const finalstreams = []
 
-    const type = episode === '0' ? 'movie' : 'series'
     id = atob(id.split(':')[1]);
 
     const streamPage = await fetch(id);
     const streamPageData = await streamPage.text();
 
+    const dood = streamPageData.match(/data-url=\"(https:\/\/dood\.ws[^"]*)/)
+    if (dood[1]) {
+        finalstreams.push(await extractBuiltinEmbed(dood[1].replace('\r', ''), 'dood'))
+    }
 
+    return(finalstreams)
 }
 
 export async function searchWecima(query: string, mediaType): Promise<searchResponse> {
