@@ -5,6 +5,10 @@ import { scrapeCustomProviders } from '../additional-sources/languages/custom-wr
 import { getMovieMediaDetails, getShowMediaDetails } from '../functions/tmdb';
 import { buildManifest, handleSearch, handleMeta } from '../additional-sources/languages/custom-wrapper';
 
+import 'dotenv/config'
+const name = process.env.name || 'Stremify'
+
+
 export const manifest = {
 	"id": "com.stremify",
 	"version": "2.7.0",
@@ -16,7 +20,7 @@ export const manifest = {
 		"movie",
 		"series"
 	],
-	"name": "Stremify",
+	"name": name,
 	"description": "A multi-server streaming addon.",
 	"idPrefixes": [
 		"tmdb:", "tt"

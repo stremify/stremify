@@ -1,6 +1,10 @@
 import { buildHTMLselectors } from "../additional-sources/languages/custom-wrapper"
 let selectors = null;
 
+import 'dotenv/config'
+const name = process.env.name || 'Stremify'
+const description = process.env.description || ''
+
 export default eventHandler(async (event) => {
   if (selectors == null) {
     selectors = await buildHTMLselectors()
@@ -88,11 +92,12 @@ export default eventHandler(async (event) => {
   
   <body>
     <div class="content">
-      <h1>Stremify</h1>
+      <h1>${name}</h1>
       <p>Version: 2.7.0</p>
       <a id="install-link" class="button">Default Install</a>
-      <p style="color:grey"><i>or</i></p>
+      ${description}
       ${selectors}
+      <p style="color:grey"><i>or</i></p>
       <a type="button" class="button" onclick="encodeSelection()">Get Link</a>
       <input type="text" id="base64-result" readonly></p>
       <a id="config-install-link" class="button">Install with configuration</a>
