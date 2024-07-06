@@ -2,7 +2,15 @@ import { pjsExtractor } from "~/functions/playerjs/pjs_extractor"
 
 const smashystreamBase = atob('aHR0cHM6Ly9lbWJlZC5zbWFzaHlzdHJlYW0uY29tLw==')
 
-let smashystreamKeys = ["DTAO/DHnAR/baks","0eeda/BVfget/Nw9","boaax/2bhatSI/ZSFac","ssdeHbt/WFnaujB/7GsaodW","xNjauiev/Tmsh0sy/frtjsi"]
+const smashystreamKeys = ["DTAO/DHnAR/baks","0eeda/BVfget/Nw9","boaax/2bhatSI/ZSFac","ssdeHbt/WFnaujB/7GsaodW","xNjauiev/Tmsh0sy/frtjsi"]
+
+let ciphers = {
+    '{v1}': '0',
+    '{v2}': '.',
+    '{v3}': '/',
+    '{v4}': 'm3u8',
+    '{v5}': '5'
+}
 
 export async function scrapeSmashystreamOrg(id: string, season: string, episode: string, stopAt: number) {
     const finalstreams = [];
@@ -17,14 +25,12 @@ export async function scrapeSmashystreamOrg(id: string, season: string, episode:
     }*/
 
     if (playerData.url_array) {
-        console.log(smashystreamKeys)
         let i = 0;
         for (const player of playerData.url_array) {
             if (i >= stopAt) {
                 return(finalstreams)
             }
             if (player.name.includes('(') != true && player.type != "iframe") {
-                console.log(player.name)
                 const sourceOutput = await fetch(player.url.replace(/\\/gm, ''))
                 if (sourceOutput.ok != true) { return([]); }
 
@@ -32,10 +38,15 @@ export async function scrapeSmashystreamOrg(id: string, season: string, episode:
 
                 for (let mediaURL of sourceResult.sourceUrls) {
                     mediaURL = mediaURL.replace("#4", "").replace(/\/\//gm, "")
-                    console.log(mediaURL)
+                    
+                    for (const encryptionkey of smashystreamKeys) {
+                        mediaURL = mediaURL.replace(btoa(encryptionkey), "")
+                    }
+                    
+                    mediaURL = atob(mediaURL)
 
-                    for (const key of smashystreamKeys) {
-                        mediaURL = mediaURL.replace(btoa(key), "")
+                    for (const cipher in ciphers) {
+                        mediaURL = mediaURL.replace(new RegExp(cipher, 'g'), ciphers[cipher])
                     }
 
                     if (mediaURL.includes("stream.smashystream")) {
@@ -71,10 +82,10 @@ export async function scrapeSmashystreamLang(id: string, season: string, episode
     if (players.ok != true) { return([]); }
 
     const playerData: result = await players.json()
-
+    /*
     if (smashystreamKeys = []) {
         smashystreamKeys = await pjsExtractor(atob('aHR0cDovL2VtYmVkLnNtYXNoeXN0cmVhbS5jb20vcGwzLmpz'))
-    }
+    }*/
 
     if (playerData.url_array) {
         for (const player of playerData.url_array) {
@@ -85,10 +96,16 @@ export async function scrapeSmashystreamLang(id: string, season: string, episode
                 const sourceResult: sourceResult = await sourceOutput.json()
 
                 for (let mediaURL of sourceResult.sourceUrls) {
-                    mediaURL = mediaURL.replace("#4", "").replace(/\\\//gm, "")
+                    mediaURL = mediaURL.replace("#4", "").replace(/\/\//gm, "")
+                    
+                    for (const encryptionkey of smashystreamKeys) {
+                        mediaURL = mediaURL.replace(btoa(encryptionkey), "")
+                    }
+                    
+                    mediaURL = atob(mediaURL)
 
-                    for (const key of smashystreamKeys) {
-                        mediaURL = mediaURL.replace(btoa(key), "")
+                    for (const cipher in ciphers) {
+                        mediaURL = mediaURL.replace(new RegExp(cipher, 'g'), ciphers[cipher])
                     }
 
                     if (mediaURL.includes("stream.smashystream")) {
