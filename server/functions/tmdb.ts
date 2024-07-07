@@ -2,8 +2,8 @@
  * This file includes code derived from @movie-web/providers by movie-web.
  * @movie-web/providers is licensed under the MIT License.
  * 
- * You can find the original source and license at:
- * https://github.com/movie-web/providers
+ * The original source of @movie-web/providers is no longer available, unfortunately. You can find an actively maintained version on the following link:
+ * https://github.com/sussy-code/providers
  * 
  * MIT License
  * 
@@ -147,7 +147,6 @@ export async function makeTMDBRequest(url: string, appendToResponse?: string): P
         if (results.length) {
             return results[0].id;
         } else {
-            console.log('No results found for the provided IMDb ID.');
             return null;
         }
     } catch (error) {
@@ -168,4 +167,43 @@ export async function separateId(id) {
         season: seasonPart,
         episode: episodePart
     };
+}
+
+export async function totalEpisodes(tmdbId, season, episode) {
+  let totalEpisodes = 0;
+
+  try {
+      const seriesResponse = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${tmdbId}`);
+      const seriesData = await seriesResponse.json();
+      const totalSeasons = seriesData.number_of_seasons;
+
+      for (let seasonNumber = 1; seasonNumber < season; seasonNumber++) {
+          const seasonResponse = await makeTMDBRequest(`https://api.themoviedb.org/3/tv/${tmdbId}/season/${seasonNumber}`);
+          const seasonData = await seasonResponse.json();
+          totalEpisodes += seasonData.episodes.length;
+      }
+
+      totalEpisodes += episode;
+
+      return totalEpisodes;
+  } catch (error) {
+      throw error;
+  }
+}
+
+export async function getEpisodeIMDbID(tmdb, season, episode): Promise<{ imdb_id: string | null }> {
+  const url = `https://api.themoviedb.org/3/tv/${tmdb}/season/${season}/episode/${episode}/external_ids`;
+
+  try {
+    const response = await makeTMDBRequest(url);
+
+    const jsonResponse = await response.json();
+
+    const imdbId = jsonResponse.imdb_id ? jsonResponse.imdb_id : null;
+
+    return(imdbId);
+  } catch (error) {
+    console.error('Failed to get episode IMDb ID:', error);
+    throw error;
+  }
 }

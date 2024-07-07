@@ -2,10 +2,17 @@
 
 import { voeResolve } from "../../embeds/voe";
 import { uqloadResolve } from "../../embeds/uqload";
+import 'dotenv/config'
+
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://frembed.fun/"
 
 export async function scrapeFrembed(imdbid, season, episode) {
+    if (remote == "true") {
+        return(null)
+        // frembed does not have any remote providers unfortunately
+    }
     let url = ""
     if (episode == 0 || episode == "0") {
         // it is a movie
@@ -35,7 +42,10 @@ export async function scrapeFrembed(imdbid, season, episode) {
                     name: "Stremify FR",
                     type: "url",
                     url: url,
-                    title: `frembed - auto (voe.sx)`
+                    title: `frembed - auto (voe.sx)`,
+                    behaviorHints: {
+                        bingeGroup: `fr_voe`
+                    }
                 };
         
             } else if (decodedurl.includes("uqload.to") || decodedurl.includes("uqload.co")) {
@@ -47,7 +57,8 @@ export async function scrapeFrembed(imdbid, season, episode) {
                     title: `frembed - auto (uqload)`,
                     behaviorHints: {
                         proxyHeaders: {"request": { "Referer": "https://uqload.to/" }},
-                        notWebReady: true
+                        notWebReady: true,
+                        bingeGroup: 'fr_uqload'
                     }
                 };
         

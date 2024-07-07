@@ -1,16 +1,12 @@
-// technically an embed too, but it uses embeds in it's own embeds so...
-// this only gets streamtape and dropload embeds
-// movies only provider
-
 import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
 import 'dotenv/config'
 
 const remote = process.env.disable_same_ip_embeds
 
-const baseurl = "https://meinecloud.click/"
+const baseurl = "https://frenchcloud.cam/"
 
-export async function scrapeMeinecloud(imdbid) {
+export async function scrapeFrenchcloud(imdbid) {
     const finalstreams = []
     const url = `${baseurl}/movie/${imdbid}`;
 
@@ -27,16 +23,17 @@ export async function scrapeMeinecloud(imdbid) {
       
       
       let match;
-      
+
       if (remote != "true") {
-        /*while ((match = droploadregex.exec(text)) !== null) {
+        /*
+        while ((match = droploadregex.exec(text)) !== null) {
           const embedurl = `https://${match[0]}`        
           const url = await evalResolver(new URL(embedurl))
               finalstreams.push({
-                  name: "Stremify DE",
+                  name: "Stremify FR",
                   type: "url",
                   url: url,
-                  title: `Meinecloud - auto (dropload.io)`
+                  title: `Frenchcloud - auto (dropload.io)`
               })
         }*/
     
@@ -44,10 +41,10 @@ export async function scrapeMeinecloud(imdbid) {
           const initialurl = await streamtapeResolve(match[0])
           const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
           finalstreams.push({
-              name: "Stremify DE",
+              name: "Stremify FR",
               type: "url",
               url: finalurl,
-              title: `Meinecloud - auto (streamtape.com)`
+              title: `Frenchcloud - auto (streamtape.com)`
           })
         }
       }
@@ -56,10 +53,10 @@ export async function scrapeMeinecloud(imdbid) {
         const embedurl = `https://${match[0]}`        
         const url = await evalResolver(new URL(embedurl))
             finalstreams.push({
-                name: "Stremify DE",
+                name: "Stremify FR",
                 type: "url",
                 url: url,
-                title: `Meinecloud - auto (supervideo.cc)`
+                title: `Frenchcloud - auto (supervideo.cc)`
             })
       }
 

@@ -2,10 +2,13 @@
 // this only gets streamtape and dropload embeds
 // movies only provider
 
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
+import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
+import 'dotenv/config'
 
-const baseurl = "https://guardahd.stream"
+const remote = process.env.disable_same_ip_embeds
+
+const baseurl = "https://mostraguarda.stream/"
 
 export async function scrapeGuardahd(imdbid) {
     const finalstreams = []
@@ -26,31 +29,34 @@ export async function scrapeGuardahd(imdbid) {
 
 
       let match;
-      while ((match = droploadregex.exec(text)) !== null) {
-        const embedurl = `https://${match[0]}`        
-        const url = await superivdeodroploadResolve(new URL(embedurl))
-            finalstreams.push({
-                name: "Stremify IT",
-                type: "url",
-                url: url,
-                title: `GuardaHD - auto (dropload.io)`
-            })
-      }
-  
-      while ((match = streamtaperegex.exec(text)) !== null) {
-        const initialurl = await streamtapeResolve(match[0])
-        const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
-        finalstreams.push({
-            name: "Stremify IT",
-            type: "url",
-            url: finalurl,
-            title: `GuardaHD - auto (streamtape.com)`
-        })
+      if (remote != "true") {
+        /*
+        while ((match = droploadregex.exec(text)) !== null) {
+          const embedurl = `https://${match[0]}`        
+          const url = await evalResolver(new URL(embedurl))
+              finalstreams.push({
+                  name: "Stremify IT",
+                  type: "url",
+                  url: url,
+                  title: `GuardaHD - auto (dropload.io)`
+              })
+        }*/
+    
+        while ((match = streamtaperegex.exec(text)) !== null) {
+          const initialurl = await streamtapeResolve(match[0])
+          const finalurl = initialurl.replace('  .substring(1).substring(2)', "")
+          finalstreams.push({
+              name: "Stremify IT",
+              type: "url",
+              url: finalurl,
+              title: `GuardaHD - auto (streamtape.com)`
+          })
+        }
       }
 
       while ((match = supervideoregex.exec(text)) !== null) {
         const embedurl = `https://${match[0]}`        
-        const url = await superivdeodroploadResolve(new URL (embedurl))
+        const url = await evalResolver(new URL (embedurl))
             finalstreams.push({
                 name: "Stremify IT",
                 type: "url",

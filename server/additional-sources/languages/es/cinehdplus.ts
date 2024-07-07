@@ -1,5 +1,8 @@
 // uses verhdlink for movies, so this scraper is for series only :+1:
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload"
+import { evalResolver } from "../../embeds/evalResolver"
+import 'dotenv/config'
+
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://cinehdplus.cam"
 
@@ -34,31 +37,40 @@ export async function scrapeCinehdplus(imdb, season, episode) {
       })
 
       const episodeData = await episodeFetch.text()
-      const droploadregex = new RegExp(`data-num="${season}x${episode}".*?data-link="(https://dropload\\.io/embed-\\w+\\.html)"`, 's'); // not the greatest way to do it, but it works ig
 
-      const droploadmatch = droploadregex.exec(episodeData);
+      /*if (remote != "true") {
+        const droploadregex = new RegExp(`data-num="${season}x${episode}".*?data-link="(https://dropload\\.io/embed-\\w+\\.html)"`, 's'); // not the greatest way to do it, but it works ig
 
-      if (droploadmatch != null) {
-          const url = await superivdeodroploadResolve(new URL(droploadmatch[1]));
-          finalstreams.push({
-              name: "Stremify ES",
-              type: "url",
-              url: url,
-              title: `Cinehdplus ${lang} - auto (dropload.io)`
-          })
-      }
+        const droploadmatch = droploadregex.exec(episodeData);
+  
+        if (droploadmatch != null) {
+            const url = await evalResolver(new URL(droploadmatch[1]));
+            finalstreams.push({
+                name: "Stremify ES",
+                type: "url",
+                url: url,
+                title: `Cinehdplus ${lang} - auto (dropload.io)`,
+                behaviorHints: {
+                    bingeGroup: `es_dropload`
+                }
+            })
+        }
+      }*/
 
       const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);
 
       const supervideomatch = supervideoregex.exec(episodeData);
       if (supervideomatch != null) {
-          const url = await superivdeodroploadResolve(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
+          const url = await evalResolver(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
 
           finalstreams.push({
               name: "Stremify ES",
               type: "url",
               url: url,
-              title: `Cinehdplus ${lang} - auto (supervideo.cc)`
+              title: `Cinehdplus ${lang} - auto (supervideo.cc)`,
+              behaviorHints: {
+                bingeGroup: `es_supervideo`
+            }
           })
       }
 

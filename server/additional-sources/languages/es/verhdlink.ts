@@ -1,9 +1,10 @@
 // movie only
 
-// todo: add doodstream + mixdrop to be scraped for meinecloud, this provider n guardahd too
-
-import { superivdeodroploadResolve } from "../../embeds/supervideo-dropload";
+import { evalResolver } from "../../embeds/evalResolver";
 import { streamtapeResolve } from "../../embeds/streamtape";
+import 'dotenv/config'
+
+const remote = process.env.disable_same_ip_embeds
 
 const baseurl = "https://verhdlink.cam"
 
@@ -28,6 +29,7 @@ export async function scrapeVerdahd(imdbid) {
             const droploadregex = /dropload\.io\/([^"]+)/g;
             const supervideoregex = /supervideo\.cc\/([^"]+)/g;
             const streamtaperegex = /https:\/\/streamtape\.com\/([^"]+)/g;
+            const upstreamregex = /upstream\.to\/([^"]+)/g;
             let lang = ""
 
             if (stringedcontent.includes("latino")) {
@@ -38,31 +40,33 @@ export async function scrapeVerdahd(imdbid) {
                 lang = "Castellano"
             }
 
-            while ((match = droploadregex.exec(stringedcontent)) !== null) {
-                const embedurl = `https://${match[0]}`
-                const url = await superivdeodroploadResolve(new URL(embedurl))
-                finalstreams.push({
-                    name: `Stremify ES`,
-                    type: "url",
-                    url: url,
-                    title: `Verhdlink ${lang} - auto (dropload.io)`
-                })
+            if (remote != "true") {
+                /*
+                while ((match = droploadregex.exec(stringedcontent)) !== null) {
+                    const embedurl = `https://${match[0]}`
+                    const url = await evalResolver(new URL(embedurl))
+                    finalstreams.push({
+                        name: `Stremify ES`,
+                        type: "url",
+                        url: url,
+                        title: `Verhdlink ${lang} - auto (dropload.io)`
+                    })
+                }*/
+    
+                while ((match = streamtaperegex.exec(stringedcontent)) !== null) {
+                    const initialurl: string = await streamtapeResolve(match[0])
+    
+                    finalstreams.push({
+                        name: "Stremify ES",
+                        type: "url",
+                        url: initialurl,
+                        title: `Verhdlink ${lang} - auto (streamtape.com)`
+                    })
+                }    
             }
-
-            while ((match = streamtaperegex.exec(stringedcontent)) !== null) {
-                const initialurl: string = await streamtapeResolve(match[0])
-
-                finalstreams.push({
-                    name: "Stremify ES",
-                    type: "url",
-                    url: initialurl,
-                    title: `Verhdlink ${lang} - auto (streamtape.com)`
-                })
-            }
-
             while ((match = supervideoregex.exec(stringedcontent)) !== null) {
                 const embedurl = `https://${match[0]}`
-                const url = await superivdeodroploadResolve(new URL(embedurl))
+                const url = await evalResolver(new URL(embedurl))
                 finalstreams.push({
                     name: "Stremify ES",
                     type: "url",
@@ -70,12 +74,10 @@ export async function scrapeVerdahd(imdbid) {
                     title: `Verhdlink ${lang} - auto (supervideo.cc)`
                 })
             }
-
         }
         return (finalstreams)
 
     } catch (error) {
-        console.log(error)
         return (null)
     }
 

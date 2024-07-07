@@ -1,14 +1,15 @@
-// supervideo and dropload are in practice the same in regard to scraping
+// used by supervideo and dropload (renamed everything cause i was possed to use it for another embed too, but things didn't go to plan with it)
+// used for the common eval packed method
 
 import { VM } from "vm2";
 import cheerio from 'cheerio';
 
-export async function superivdeodroploadResolve(link: URL) {
+export async function evalResolver(link: URL) {
     const response = await fetch(link, {
         redirect: 'follow'
     });
     if (!response.ok) {
-        throw new Error(`Failed to fetch`);
+        return(null)
     }
 
     const bodyText = await response.text();
@@ -19,20 +20,18 @@ export async function superivdeodroploadResolve(link: URL) {
     $('script').each(function() {
         const scriptContent = $(this).html();
         if (scriptContent && scriptContent.includes('eval(')) {
-            script = scriptContent;
+            script = scriptContent.replace('eval', 'console.log');
             return (false); 
         }
     });
 
     if (script != null) {
-
         const deobfuscated = await deobfuscate(script)
 
-
-        const streamregex = /sources:\s*\[{\s*file:\s*["'](?<url>[^"']+)/;
+        const streamregex = /{file:\"([^"]*)/;
         const stream = streamregex.exec(deobfuscated)
-        if (stream?.groups) {
-            return(stream.groups.url)
+        if (stream[1]) {
+            return(stream[1])
         } else {
             return(null)
         }
@@ -44,7 +43,7 @@ export async function superivdeodroploadResolve(link: URL) {
 
 }
 
-async function deobfuscate(script: string): Promise < string > {
+export async function deobfuscate(script: string): Promise < string > {
     let capturedContent = "";
 
     const sandbox = {
@@ -69,6 +68,6 @@ async function deobfuscate(script: string): Promise < string > {
         vm.run(script);
         return Promise.resolve(capturedContent);
     } catch (error) {
-        return Promise.reject('Error deobfuscating.');
+        return Promise.reject();
     }
 }
