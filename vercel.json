@@ -1,0 +1,10 @@
+{
+  "github": {
+    "enabled": true,
+    "autoAlias": true,
+    "autoJobCancelation": true,
+    "deployments": {
+      "productionBranch": "v2.7"
+    }
+  }
+}
