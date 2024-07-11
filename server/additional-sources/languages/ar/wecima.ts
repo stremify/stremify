@@ -1,4 +1,4 @@
-import { extractBuiltinEmbed } from "~/additional-sources/embeds/builtinEmbed"
+import { govvidResolve } from "~/additional-sources/embeds/govid"
 import { convertImdbIdToTmdbId, getMovieMediaDetails, getShowMediaDetails } from "~/functions/tmdb"
 
 const wecimaBase = "https://wecima.show"
@@ -12,9 +12,21 @@ export async function scrapeWecima(id: string) {
     const streamPage = await fetch(id);
     const streamPageData = await streamPage.text();
 
-    const dood = streamPageData.match(/data-url=\"(https:\/\/dood\.ws[^"]*)/)
-    if (dood[1]) {
-        finalstreams.push(await extractBuiltinEmbed(dood[1].replace('\r', ''), 'dood'))
+    const govid = (/url="([^"]*)" class="hoverable activable"><i class="fal fa-play"><\/i><strong>GoViD/).exec(streamPageData)
+    if (govid[1]) {
+        console.log('s')
+        const urls = await govvidResolve(new URL(govid[1]))
+        for (const url of urls) {
+            finalstreams.push({
+                name: "Stremify AR",
+                type: "url",
+                url,
+                title: "WeCima - govid",
+                behaviorHints: {
+                    bingeGroup: `wecima_govid`,
+                }
+            })
+        }
     }
 
     return(finalstreams)
@@ -66,49 +78,72 @@ export async function getWecimaMeta(id: string, type: 'movie' | 'series') {
 
     let videos = [];
     if (type == 'series') {
-        const episodePanelRegex = /<div class="Episodes--Seasons--Episodes">[^*]*ifr/
-        const episodePanelHTML = episodePanelRegex.exec(data)
-
         const episodeRegex = /<a class="hoverable activable" href="([^"]*)"><div class="Thumb"><span><i class="fa fa-play"><\/i><\/span><\/div><episodeArea><episodeTitle>([^<]*)/gm
-
-        let episodeElem;
-        let episode = 1;
-        while ((episodeElem = episodeRegex.exec(episodePanelHTML[0])) != null) {
-            let episodeNumber = episodeElem[2].replace(/\D/g, '')
-            videos.push({
-                "season": 1,
-                "episode": parseInt(episodeNumber) || episode, 
-                "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
-                "title": episodeElem[2],
-            })
-            episode++;
-        };
-        const seasonsRegex = /<div class="List--Seasons--Episodes">[^*]*?<\/div>/
-        const seasonElement = seasonsRegex.exec(data)
-        const nonActiveSeasonRegex = /<a class="hoverable activable" href="([^"]*)">([^<]*)/gm
-        let match;
-        let season = 1;
-        while ((match = nonActiveSeasonRegex.exec(seasonElement[0])) != null) {
-            season++;
-            const seasonData = await fetch(match[1])
-            const seasonHTML = await seasonData.text()
-
-            const episodePanel = (/div class="Episodes--Seasons--Episodes">[^*]*--p/).exec(seasonHTML)
+        try {
+            const episodePanelRegex = /<div class="Episodes--Seasons--Episodes">[^*]*ifr/
+            const episodePanelHTML = episodePanelRegex.exec(data)
+        
+            let episodeElem;
             let episode = 1;
-            try {
-                while ((episodeElem = episodeRegex.exec(episodePanel[0])) != null) {
-                    let episodeNumber = episodeElem[2].replace(/\D/g, '')
-                    videos.push({
-                        "season": season,
-                        "episode": parseInt(episodeNumber) || episode,
-                        "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
-                        "title": episodeElem[2],
-                    })
-                    episode++;
-                };
-            } catch(err) {
-                console.log(err)
+            while ((episodeElem = episodeRegex.exec(episodePanelHTML[0])) != null) {
+                let episodeNumber = episodeElem[2].replace(/\D/g, '')
+                videos.push({
+                    "season": 1,
+                    "episode": parseInt(episodeNumber) || episode, 
+                    "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
+                    "title": episodeElem[2],
+                })
+                episode++;
+            };
+        } catch(err) {
+            const episodePanelRegex = /<div class="Seasons--Episodes">[^*]*singlesections/
+            const episodePanelHTML = episodePanelRegex.exec(data)
+    
+            const episodeRegex = /<a class="hoverable activable" href="([^"]*)"><div class="Thumb"><span><i class="fa fa-play"><\/i><\/span><\/div><episodeArea><episodeTitle>([^<]*)/gm
+    
+            let episodeElem;
+            let episode = 1;
+            while ((episodeElem = episodeRegex.exec(episodePanelHTML[0])) != null) {
+                let episodeNumber = episodeElem[2].replace(/\D/g, '')
+                videos.push({
+                    "season": 1,
+                    "episode": parseInt(episodeNumber) || episode, 
+                    "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
+                    "title": episodeElem[2],
+                })
+                episode++;
+            };
+        }
+
+        try {
+            const seasonsRegex = /<div class="List--Seasons--Episodes">[^*]*?<\/div>/
+            const seasonElement = seasonsRegex.exec(data)
+            const nonActiveSeasonRegex = /<a class="hoverable activable" href="([^"]*)">([^<]*)/gm
+            let match;
+            let season = 1;
+            while ((match = nonActiveSeasonRegex.exec(seasonElement[0])) != null) {
+                season++;
+                const seasonData = await fetch(match[1])
+                const seasonHTML = await seasonData.text()
+    
+                const episodePanel = (/div class="Episodes--Seasons--Episodes">[^*]*--p/).exec(seasonHTML)
+                let episode = 1;
+                let episodeElem;
+                try {
+                    while ((episodeElem = episodeRegex.exec(episodePanel[0])) != null) {
+                        let episodeNumber = episodeElem[2].replace(/\D/g, '')
+                        videos.push({
+                            "season": season,
+                            "episode": parseInt(episodeNumber) || episode,
+                            "id": `${weCimaPrefix}${btoa(episodeElem[1])}`,
+                            "title": episodeElem[2],
+                        })
+                        episode++;
+                    };
+                } catch(err) {}
             }
+        } catch(err) {
+            console.log(err);
         }
     }
     
