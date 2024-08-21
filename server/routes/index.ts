@@ -95,6 +95,7 @@ export default eventHandler(async (event) => {
       <h1>${name}</h1>
       <p>Version: 2.7.0</p>
       <a id="install-link" class="button">Default Install</a>
+      <br> <br>
       ${description}
       ${selectors}
       <p style="color:grey"><i>or</i></p>

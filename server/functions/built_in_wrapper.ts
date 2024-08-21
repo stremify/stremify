@@ -1,4 +1,4 @@
-import { SourcererOutput, getBuiltinSources, targets, makeProviders, makeStandardFetcher } from "@movie-web/providers"
+import { SourcererOutput, getBuiltinSources, targets, makeProviders, makeStandardFetcher, buildProviders } from "@movie-web/providers"
 import { makeWSFetcher } from "~/functions/fetch";
 
 let sources = []
@@ -6,7 +6,6 @@ const disabled_sources = ["nsbx", "smashystream"]
 
 import 'dotenv/config'
 const timeoutTime = parseInt(process.env.provider_timeout) || 10000;
-
 
 export async function scrapeBuiltIn(media, clientId?: string) {
     const streams = []
