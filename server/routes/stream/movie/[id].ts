@@ -13,7 +13,7 @@ export default eventHandler(async (event) => {
     const path = getRouterParam(event, 'id')
     const id = path.split('.')[0];
 
-    return({streams:[await scrapeBuiltinMovie(id)]})
+    return({streams:await scrapeBuiltinMovie(id)})
 });
 
 export async function scrapeBuiltinMovie(id) {

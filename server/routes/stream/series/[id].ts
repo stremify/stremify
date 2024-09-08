@@ -15,7 +15,7 @@ export default eventHandler(async (event) => {
     const decodedId = decodeURIComponent(path)
     const id = decodedId.split('.')[0];
 
-    return({streams:[await scrapeBuiltinSeries(id)]})
+    return({streams:await scrapeBuiltinSeries(id)})
 });
 
 export async function scrapeBuiltinSeries(id) {
