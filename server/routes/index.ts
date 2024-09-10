@@ -93,7 +93,7 @@ export default eventHandler(async (event) => {
   <body>
     <div class="content">
       <h1>${name}</h1>
-      <p>Version: 2.7.0</p>
+      <p>Version: 2.7.1</p>
       <a id="install-link" class="button">Default Install</a>
       <br> <br>
       ${description}
