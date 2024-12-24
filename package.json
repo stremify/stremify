@@ -19,6 +19,7 @@
     "nitro-cors": "^0.7.1",
     "node-ts-cache": "^4.4.0",
     "node-ts-cache-storage-memory": "^4.4.0",
+    "puppeteer": "^23.11.1",
     "vm2": "^3.9.19"
   }
 }
