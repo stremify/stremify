@@ -5,32 +5,24 @@ import { convertImdbIdToTmdbId } from "../../../functions/tmdb"
 // Most URLs and URL regexes declared here are obfuscated.
 
 // Base URL to fetch initial data.
-const FETCH_URL_BASE = atob('aHR0cHM6Ly92aWRsaW5rLnBybw==')
+const VIDLINK_URL_BASE = atob('aHR0cHM6Ly92aWRsaW5rLnBybw==')
 
 // Any incoming request URL which matches any of these regexes is allowed.
-const URL_REGEX_ALLOWED = [
+const VIDLINK_URL_REGEX_ALLOWED = [
     new RegExp(atob('Xmh0dHBzOlwvXC8oW2EtekEtel0rXC4pP3ZpZGxpbmtcLi4qJA==')),
     new RegExp(atob('Xmh0dHBzOlwvXC8oW2EtekEtel0rXC4pP3RtZGJcLi4qJA==')),
     /^https:\/\/.*\.m3u8$/,
 ]
 
-// Any incoming request URL which matches any of these regexes is explicitly denied.
-const URL_REGEX_DENIED = []
-
 // Returns whether the given request URL is allowed.
 function requestIsAllowed(url: string) {
     let allowlisted = false
-    let denylisted = false
 
-    for (const urlRegexAllowed of URL_REGEX_ALLOWED) {
+    for (const urlRegexAllowed of VIDLINK_URL_REGEX_ALLOWED) {
         allowlisted |= urlRegexAllowed.exec(url) !== null
     }
-    for (const urlRegexDenied of URL_REGEX_DENIED) {
-        denylisted |= urlRegexDenied.exec(url) !== null
-    }
 
-    // A valid URL must be both allowed and not explicitly denied.
-    return allowlisted && !denylisted
+    return allowlisted
 }
 
 // Scrapes vidlink to return a stream from the given id and episode information if necessary.
@@ -61,7 +53,7 @@ export async function scrapeVidLink(id: string, season: string, episode: string,
     })
 
     // Get the URL to start scraping, which could be for a movie or TV series.
-    let fetchUrl = episode === '0' ? `${FETCH_URL_BASE}/movie/${id}` : `${FETCH_URL_BASE}/tv/${id}/${season}/${episode}`
+    let fetchUrl = episode === '0' ? `${VIDLINK_URL_BASE}/movie/${id}` : `${VIDLINK_URL_BASE}/tv/${id}/${season}/${episode}`
     
     // Navigate to the page.
     await page.goto(fetchUrl, {

@@ -3,10 +3,10 @@ import puppeteer from 'puppeteer';
 // Most URLs and URL regexes declared here are obfuscated.
 
 // Base URL to fetch initial data.
-const FETCH_URL_BASE = atob('aHR0cHM6Ly92aWRzcmMueHl6L2VtYmVk')
+const VIDSRC_URL_BASE = atob('aHR0cHM6Ly92aWRzcmMueHl6L2VtYmVk')
 
 // Any incoming request URL which matches any of these regexes is allowed.
-const URL_REGEX_ALLOWED = [
+const VIDSRC_URL_REGEX_ALLOWED = [
     new RegExp(atob('Xmh0dHBzXDpcL1wvKFthLXpBLXpdK1wuKT92aWRzcmNcLi4qJA==')),
     new RegExp(atob('Xmh0dHBzXDpcL1wvKFthLXpBLXpdK1wuKT9jbG91ZGZsYXJlXC4uKiQ=')),
     new RegExp(atob('Xmh0dHBzXDpcL1wvKFthLXpBLXpdK1wuKT9lZGdlZGVsaXZlcnluZXR3b3JrXC4uKiQ=')),
@@ -17,7 +17,7 @@ const URL_REGEX_ALLOWED = [
 ]
 
 // Any incoming request URL which matches any of these regexes is explicitly denied.
-const URL_REGEX_DENIED = [
+const VIDSRC_URL_REGEX_DENIED = [
     new RegExp(atob('Xmh0dHBzXDpcL1wvLipcL2Rpc2FibGUtZGV2dG9vbChcLm1pbik/XC5qcyhcPy4qKT8k')),
 ]
 
@@ -42,10 +42,10 @@ function requestIsAllowed(url: string) {
     let allowlisted = false
     let denylisted = false
 
-    for (const urlRegexAllowed of URL_REGEX_ALLOWED) {
+    for (const urlRegexAllowed of VIDSRC_URL_REGEX_ALLOWED) {
         allowlisted |= urlRegexAllowed.exec(url) !== null
     }
-    for (const urlRegexDenied of URL_REGEX_DENIED) {
+    for (const urlRegexDenied of VIDSRC_URL_REGEX_DENIED) {
         denylisted |= urlRegexDenied.exec(url) !== null
     }
 
@@ -72,7 +72,7 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
     })
 
     // Get the URL to start scraping, which could be for a movie or TV series.
-    let fetchUrl = episode === '0' ? `${FETCH_URL_BASE}/movie/${id}` : `${FETCH_URL_BASE}/tv/${id}/${season}/${episode}`
+    let fetchUrl = episode === '0' ? `${VIDSRC_URL_BASE}/movie/${id}` : `${VIDSRC_URL_BASE}/tv/${id}/${season}/${episode}`
 
     // Navigate to the page via puppeteer and get the player iframe, which will have a clickable
     // play button inside which loads the stream.
