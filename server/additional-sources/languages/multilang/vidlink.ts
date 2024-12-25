@@ -1,6 +1,5 @@
-import puppeteer from 'puppeteer';
-
 import { convertImdbIdToTmdbId } from "../../../functions/tmdb"
+import { BrowserScraper } from "../../browser_scraper"
 
 // Most URLs and URL regexes declared here are obfuscated.
 
@@ -14,77 +13,40 @@ const VIDLINK_URL_REGEX_ALLOWED = [
     /^https:\/\/.*\.m3u8$/,
 ]
 
-// Returns whether the given request URL is allowed.
-function requestIsAllowed(url: string) {
-    let allowlisted = false
-
-    for (const urlRegexAllowed of VIDLINK_URL_REGEX_ALLOWED) {
-        allowlisted |= urlRegexAllowed.exec(url) !== null
-    }
-
-    return allowlisted
-}
-
 // Scrapes vidlink to return a stream from the given id and episode information if necessary.
 export async function scrapeVidLink(id: string, season: string, episode: string, stopAt: number) {
-    // Create puppeteer headless browser to conduct the scraping. This is slower than direct HTTP
-    // requests, but circumvents any need to stay on top of API token/auth changes.
-    let browser = await puppeteer.launch({headless: 'shell'})
-    const page = await browser.newPage()
-
     // Convert IMDB id to TMDB id, as that is what vidlink uses.
     if (id.startsWith('tt')) {
       id = await convertImdbIdToTmdbId(id)
     }
     if (id === null) {
       console.log(`Was not able to convert IMDB id to TMDB id.`)
-      await browser.close()
       return []
     }
 
-    // Only allowed request domains will be let through. Safeguarding traffic will block ads and
-    // other unwanted traffic.
-    await page.setRequestInterception(true)
-    page.on('request', request => {
-        if (!requestIsAllowed(request.url())) {
-            return request.abort()
-        }
-        request.continue()
-    })
-
-    // Get the URL to start scraping, which could be for a movie or TV series.
+    // Init BrowserScraper with a constructed URL based on the id.
     let fetchUrl = episode === '0' ? `${VIDLINK_URL_BASE}/movie/${id}` : `${VIDLINK_URL_BASE}/tv/${id}/${season}/${episode}`
+    let browserScraper = new BrowserScraper(VIDLINK_URL_REGEX_ALLOWED, /*urlRegexesDenied=*/[])
+    await browserScraper.init()
     
-    // Navigate to the page.
-    await page.goto(fetchUrl, {
-        timeout: 5000,
-    })
-
-    // Wait for the master m3u8 to come over network (for 10 seconds max), then close the page.
-    let masterStreamUrl = undefined
+    // Navigate to the page and wait for the stream.
+    let masterStreamUrl = null
     try {
-        await page.waitForRequest(request => {
-            if (request.url().endsWith('m3u8')) {
-                console.log(`m3u8 found: ${request.url()}`)
-                masterStreamUrl = request.url()
-                return true
-            }
-            return false
-        }, {
-            timeout: 10000,
-        })
+      await browserScraper.goto(fetchUrl)
+      masterStreamUrl = await browserScraper.getStreamUrl(/*timeout=*/10000)
+      await browserScraper.close()
     } catch (err) {
-        console.log(`m3u8 stream url catching failed: ${err.message}`)
-    }
-
-    await browser.close()
-
-    // If no stream url was found, nothing should be returned to Stremio.
-    if (!masterStreamUrl) {
-        return []
+      console.log(`vidlink scrape failed: ${err.message}`)
+    } finally {
+      // If no stream was found, nothing should be returned to Stremio.
+      if (!masterStreamUrl) {
+          console.log(`No stream found from vidlink.`)
+          return []
+      }
     }
 
     // Otherwise, return a working stream.
+    console.log(`Stream found from vidlink: ${masterStreamUrl}`)
     return [{
         name: `Stremify`,
         type: 'url',
