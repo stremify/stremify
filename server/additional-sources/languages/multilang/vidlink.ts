@@ -34,10 +34,10 @@ export async function scrapeVidLink(id: string, season: string, episode: string,
     try {
       await browserScraper.goto(fetchUrl)
       masterStreamUrl = await browserScraper.getStreamUrl(/*timeout=*/10000)
-      await browserScraper.close()
     } catch (err) {
       console.log(`vidlink scrape failed: ${err.message}`)
     } finally {
+      await browserScraper.close()
       // If no stream was found, nothing should be returned to Stremio.
       if (!masterStreamUrl) {
           console.log(`No stream found from vidlink.`)
