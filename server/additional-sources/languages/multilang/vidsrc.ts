@@ -13,7 +13,6 @@ const VIDSRC_URL_REGEX_ALLOWED = [
     new RegExp(atob('Xmh0dHBzXDpcL1wvKFthLXpBLXpdK1wuKT9nb29nbGVhcGlzXC4uKiQ=')),
     new RegExp(atob('Xmh0dHBzXDpcL1wvLipcL3V0XC5qcyhcPy4qKT8k')),
     new RegExp(atob('Xmh0dHBzXDpcL1wvKFthLXpBLXpdK1wuKT90bWRi')),
-    /^https\:\/\/.*\.m3u8$/,
 ]
 
 // Any incoming request URL which matches any of these regexes is explicitly denied.
@@ -39,7 +38,11 @@ async function navigateAndGetPlayerIframe(browserScraper, fetchUrl: string, maxA
 export async function scrapeVidSrc(id: string, season: string, episode: string, stopAt: number) {
     // Init BrowserScraper with a constructed URL based on the id.
     let fetchUrl = episode === '0' ? `${VIDSRC_URL_BASE}/movie/${id}` : `${VIDSRC_URL_BASE}/tv/${id}/${season}/${episode}`
-    let browserScraper = new BrowserScraper(VIDSRC_URL_REGEX_ALLOWED, VIDSRC_URL_REGEX_DENIED)
+    let browserScraper = new BrowserScraper(
+        /*provider=*/'vidsrc',
+        /*streamRegex=*//^https:\/\/.*\.m3u8$/,
+        VIDSRC_URL_REGEX_ALLOWED,
+        VIDSRC_URL_REGEX_DENIED)
     await browserScraper.init()
 
     // Navigate to the page and get the player iframe, which will have a clickable play button
@@ -66,26 +69,8 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
         return []
     }
 
-    // Wait for the master m3u8 to come over network (for 10 seconds max), then close the page.
-    let masterStreamUrl = null
-    try {
-      masterStreamUrl = await browserScraper.getStreamUrl(/*timeout=*/10000)
-    } catch (err) {
-      console.log(`vidsrc scrape failed: ${err.message}`)
-    } finally {
-        await browserScraper.close()
-      // If no stream was found, nothing should be returned to Stremio.
-      if (!masterStreamUrl) {
-          console.log(`No stream found from vidlink.`)
-          return []
-      }
-    }
-
-    // Otherwise, return a working stream.
-    return [{
-        name: `Stremify`,
-        type: 'url',
-        url: masterStreamUrl,
-        description: `vidsrc - HLS`,
-    }]
+    // Wait for streams to come over the network and return them.
+    let streams = await browserScraper.getStreams(/*timeout=*/10000)
+    await browserScraper.close()
+    return streams
 }

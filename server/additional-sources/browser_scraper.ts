@@ -4,7 +4,14 @@ import puppeteer from 'puppeteer';
 // requests, but circumvents any need to stay on top of API token/auth changes. Useful for
 // providers without a publicy available API for direct stream links.
 export class BrowserScraper {
-  constructor(urlRegexesAllowed, urlRegexesDenied) {
+  constructor(provider: string, streamRegex, urlRegexesAllowed, urlRegexesDenied) {
+    // Name of the provider.
+    this.provider = provider
+
+    // Regex of the stream to find.
+    this.streamRegex = streamRegex
+
+    // Other URLs to either be allowed or explicitly denied via regex.
     this.urlRegexesAllowed = urlRegexesAllowed
     this.urlRegexesDenied = urlRegexesDenied
 
@@ -22,7 +29,7 @@ export class BrowserScraper {
     // other unwanted traffic.
     await this.page.setRequestInterception(true)
     this.page.on('request', request => {
-      let allowlisted = false
+      let allowlisted = this.streamRegex.exec(request.url()) !== null
       let denylisted = false
 
       for (const urlRegexAllowed of this.urlRegexesAllowed) {
@@ -51,13 +58,13 @@ export class BrowserScraper {
     })
   }
 
-  // Waits for the stream url to come over the network and returns it.
-  async getStreamUrl(timeout: number) {
+  // Waits for the streams to come over the network and returns them.
+  async getStreams(timeout: number) {
     let streamUrl = null
 
     try {
       await this.page.waitForRequest(request => {
-        if (request.url().endsWith('m3u8')) {
+        if (this.streamRegex.exec(request.url())) {
           streamUrl = request.url()
           return true
         }
@@ -65,10 +72,21 @@ export class BrowserScraper {
       }, {
         timeout: timeout,
       })
-    } catch (err) {
-        console.log(`m3u8 stream url catching failed: ${err.message}`)
-    }
 
-    return streamUrl
+      if (!streamUrl) {
+        throw new Error(`stream empty`)
+      }
+
+      console.log(`Stream found from ${this.provider}: ${streamUrl}`)
+      return [{
+        name: 'Stremify',
+        type: 'url',
+        url: streamUrl,
+        description: `${this.provider} - HLS`
+      }]
+    } catch (err) {
+        console.log(`${this.provider} failed to find stream: ${err.message}`)
+        return []
+    }
   }
 }
