@@ -1,8 +1,32 @@
-import puppeteer from 'puppeteer';
+import { connect }  from 'puppeteer-real-browser'
 
-// Scraper which uses a headless browser to conduct its scraping. This is slower than direct HTTP
-// requests, but circumvents any need to stay on top of API token/auth changes. Useful for
-// providers without a publicy available API for direct stream links.
+// TODO: figure out how to close this browser on SIGTERM, SIGINT, and SIGHUP.
+//
+// All signs have pointed to a non-headless browser being necessary for full functionality.
+// Instantiating such a browser for every individual provider on every individual call is
+// incredibly wasteful, so a singleton is used to hold the browser instance.
+//
+// That being said, catching any interrupt signals from node to close this singleton instance has
+// been a nightmare, as seemingly every forum post online has an "easy fix" that doesn't do
+// anything here. Maybe one day it will be figured out, but until then, you must manage your
+// browser instances manually. It is especially annoying with nodemon.
+let BROWSER = null
+console.log(`Initializing puppeteer browser...`)
+connect({
+    headless: false,
+    turnstile: true,
+    disableXvfb: false,
+}).then((newBrowser, firstPage) => {
+  console.log(`Browser ready via real browser. Make sure to clean up any zombie processes on app closure.`)
+  BROWSER = newBrowser.browser
+})
+
+// Scraper which uses a browser to conduct its scraping. This is slower than direct HTTP requests,
+// but circumvents any need to stay on top of API token/auth changes. Useful for providers without
+// a publicy available API for direct stream links (e.g vidsrc, vidlink, and smashystream).
+//
+// Each instance of BrowserScraper represents a single open page on a singleton Chrome browser
+// instance which is initiated on app startup.
 export class BrowserScraper {
   constructor(provider: string, streamRegex, urlRegexesAllowed, urlRegexesDenied) {
     // Name of the provider.
@@ -16,14 +40,14 @@ export class BrowserScraper {
     this.urlRegexesDenied = urlRegexesDenied
 
     // These fields will be overridden in init().
-    this.browser = null
     this.page = null
   }
 
   // Initializes the BrowserScraper's headless browser. Must be called before any other methods.
   async init() {
-    this.browser = await puppeteer.launch({headless: 'shell'})
-    this.page = await this.browser.newPage()
+    // Wait for browser to be ready.
+    while (!BROWSER);
+    this.page = await BROWSER.newPage()
 
     // Only allowed request domains will be let through. Safeguarding traffic will block ads and
     // other unwanted traffic.
@@ -46,16 +70,9 @@ export class BrowserScraper {
     })
   }
 
-  // Closes the headless browser.
+  // Closes the page. After calling this, the BrowserScraper should not be used again.
   async close() {
-    await this.browser.close()
-  }
-
-  // Navigates the browser page to the given URL.
-  async goto(url: string) {
-    await this.page.goto(url, {
-      timeout: 5000
-    })
+    await this.page.close()
   }
 
   // Waits for the streams to come over the network and returns them.
