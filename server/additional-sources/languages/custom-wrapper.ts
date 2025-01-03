@@ -76,12 +76,12 @@ const info = new Map<string, any>([
     ["guardahd", {name: "GuardaHD", lang_emoji: "🇮🇹"}],
     //["smashystreamtr", {name: "Smashystream TR", lang_emoji: "🇹🇷"}],
     //["smashystreamhi", {name: "Smashystream HI", lang_emoji: "🇮🇳"}],
+    ["vidlink", {name: "vidlink", lang_emoji: "🎥 🖥️"}],
+    ["vidsrc", {name: "vidsrc", lang_emoji: "🎥 🖥️"}],
     ["visioncine", {name: "Visioncine (Catalog Resolver)", lang_emoji: "🇧🇷"}],
     ["wecima", {name: "WeCima (Catalog Resolver)", lang_emoji: "🇸🇦"}],
     ["akwam", {name: "Akwam (Catalog Resolver)", lang_emoji: "🇸🇦"}],
     //["smashystream", {name: "Smashystream", lang_emoji: "🎥"}],
-    ["vidlink", {name: "vidlink", lang_emoji: "🎥"}],
-    ["vidsrc", {name: "vidsrc", lang_emoji: "🎥"}],
     ["dramacool", {name: "DramaCool (TMDB/IMDB)", lang_emoji: "🎭"}],
     ["dramacool_catalog", {name: "DramaCool (Catalog Resolver)", lang_emoji: "🎭"}],
     ["gogoanime", {name: "GogoAnime (Kitsu)", lang_emoji: "🌸"}],
@@ -179,6 +179,8 @@ export async function buildHTMLselectors() {
     });
     return (`
         <h3>Configure</h3>
+        <p>Any provider noted with 🖥️ uses a real Chrome browser to scrape.
+        Browser scraping must be enabled in .env to use these providers.</p>
         <form id="language-form">
         ${selector}
     </form>`)

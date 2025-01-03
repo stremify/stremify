@@ -31,10 +31,10 @@ export async function scrapeVidLink(id: string, season: string, episode: string,
     /*streamRegex=*//^https:\/\/.*\.m3u8$/,
     VIDLINK_URL_REGEX_ALLOWED,
     /*urlRegexesDenied=*/[])
-  await browserScraper.init()
 
   // Wait for streams to come over the network and return them.
   try {
+    await browserScraper.init()
     await browserScraper.page.goto(fetchUrl, {
       timeout: 5000
     })

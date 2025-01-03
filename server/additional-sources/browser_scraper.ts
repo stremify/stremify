@@ -1,3 +1,5 @@
+import 'dotenv/config'
+
 import { connect }  from 'puppeteer-real-browser'
 
 // TODO: figure out how to close this browser on SIGTERM, SIGINT, and SIGHUP.
@@ -11,15 +13,19 @@ import { connect }  from 'puppeteer-real-browser'
 // anything here. Maybe one day it will be figured out, but until then, you must manage your
 // browser instances manually. It is especially annoying with nodemon.
 let BROWSER = null
-console.log(`Initializing puppeteer browser...`)
-connect({
-    headless: false,
-    turnstile: true,
-    disableXvfb: false,
-}).then((newBrowser, firstPage) => {
-  console.log(`Browser ready via real browser. Make sure to clean up any zombie processes on app closure.`)
-  BROWSER = newBrowser.browser
-})
+
+// Assign BROWSER if enabled via environment variables.
+if (process.env.enable_browser_scraping === "true") {
+  console.log(`Browser scraping enabled. Initializing puppeteer browser...`)
+  connect({
+      headless: false,
+      turnstile: true,
+      disableXvfb: false,
+  }).then((newBrowser, firstPage) => {
+    console.log(`Browser ready via real browser. Make sure to clean up any zombie processes on app closure.`)
+    BROWSER = newBrowser.browser
+  })
+}
 
 // Scraper which uses a browser to conduct its scraping. This is slower than direct HTTP requests,
 // but circumvents any need to stay on top of API token/auth changes. Useful for providers without
@@ -45,8 +51,12 @@ export class BrowserScraper {
 
   // Initializes the BrowserScraper's headless browser. Must be called before any other methods.
   async init() {
-    // Wait for browser to be ready.
-    while (!BROWSER);
+    // Ensure browser is active.
+    if (!BROWSER) {
+      throw new Error(`Browser not active. Have you enabled browser scraping in .env?`)
+    }
+
+    // Open the one tab to be used and associated with this scraper.
     this.page = await BROWSER.newPage()
 
     // Only allowed request domains will be let through. Safeguarding traffic will block ads and
@@ -94,7 +104,6 @@ export class BrowserScraper {
         throw new Error(`stream empty`)
       }
 
-      console.log(`Stream found from ${this.provider}: ${streamUrl}`)
       return [{
         name: 'Stremify',
         type: 'url',

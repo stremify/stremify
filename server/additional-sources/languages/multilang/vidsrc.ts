@@ -30,14 +30,15 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
         /*streamRegex=*//^https:\/\/.*\.m3u8$/,
         VIDSRC_URL_REGEX_ALLOWED,
         VIDSRC_URL_REGEX_DENIED)
-    await browserScraper.init()
 
     // Find play button and click it. This will trigger stream links to come over the network.
     try {
+        await browserScraper.init()
+
         // Navigate to the page and wait for all network traffic to stop. This will ensure all
         // elements are loaded on the page.
         await browserScraper.page.goto(fetchUrl, {
-            timeout: 10000,
+            timeout: 7000,
             waitUntil: 'networkidle0'
         })
         // Double check that all relevant iframes are loaded, and store the player iframe.
