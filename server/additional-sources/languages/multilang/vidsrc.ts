@@ -23,7 +23,7 @@ const VIDSRC_URL_REGEX_DENIED = [
 // Scrapes vidsrc to return a stream from the given id and episode information if necessary.
 export async function scrapeVidSrc(id: string, season: string, episode: string, stopAt: number) {
     let streams = []
-    // Init BrowserScraper with a constructed URL based on the id.
+    // Create BrowserScraper with a constructed URL based on the id.
     let fetchUrl = episode === '0' ? `${VIDSRC_URL_BASE}/movie/${id}` : `${VIDSRC_URL_BASE}/tv/${id}/${season}/${episode}`
     let browserScraper = new BrowserScraper(
         /*provider=*/'vidsrc',
@@ -31,7 +31,6 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
         VIDSRC_URL_REGEX_ALLOWED,
         VIDSRC_URL_REGEX_DENIED)
 
-    // Find play button and click it. This will trigger stream links to come over the network.
     try {
         await browserScraper.init()
 
@@ -41,7 +40,7 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
             timeout: 7000,
             waitUntil: 'networkidle0'
         })
-        // Double check that all relevant iframes are loaded, and store the player iframe.
+        // Double check that all relevant iframes are loaded.
         const playerContainerFrame = await browserScraper.page.waitForFrame(async frame => {
             const hasPlayer = (await frame.$("#player_iframe")) !== null
             return hasPlayer
@@ -49,8 +48,8 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
             timeout: 2000
         })
         const playerIframe = await browserScraper.page.waitForFrame(async frame => {
-            const hasPlayer = (await frame.$("#pl_but")) !== null
-            return hasPlayer
+            const hasButton = (await frame.$("#pl_but")) !== null
+            return hasButton
         }, {
             timeout: 2000
         })
@@ -61,7 +60,7 @@ export async function scrapeVidSrc(id: string, season: string, episode: string, 
         // Wait for streams to come over the network and return them.
         streams = await browserScraper.getStreams(/*timeout=*/5000)
     } catch (err) {
-        console.log(`Failed to find player button: ${err.message}`)
+        console.log(`Vidsrc failed unexpectedly: ${err.message}`)
     } finally {
         await browserScraper.close()
         return streams
