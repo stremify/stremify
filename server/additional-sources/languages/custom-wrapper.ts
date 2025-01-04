@@ -8,6 +8,8 @@ import { scrapeCinehdplus } from './es/cinehdplus';
 import { scrapeFrenchcloud } from "./fr/frenchcloud";
 import { dramacoolMeta, dramacoolPrefix, dramacool_catalog, scrapeDramacool, scrapefromDramacoolCatalog, searchDramacool } from "./multilang/dramacool";
 import { scrapeSmashystreamLang, scrapeSmashystreamOrg } from "./multilang/smashystream"
+import { scrapeVidLink } from "./multilang/vidlink"
+import { scrapeVidSrc } from "./multilang/vidsrc"
 import { gogoanimeMeta, gogoanimePrefix, gogoanime_catalog, scrapeGogoanime, scrapefromGogoanimeCatalog, searchGogoanime } from "./multilang/gogoanime";
 import { scrapeBuiltinMovie } from "~/routes/stream/movie/[id]";
 import { scrapeBuiltinSeries } from "~/routes/stream/series/[id]";;
@@ -36,6 +38,8 @@ const movies: Map<string, (imdbid: string, media?: any) => Promise<any>> = new M
     ["dramacool_catalog", async (id: string) => await scrapefromDramacoolCatalog(id)],
     ["visioncine", async (id) => await scrapeVisioncine(id)],
     //["smashystream", async (imdbid: string) => await scrapeSmashystreamOrg(imdbid, '0', '0', 1)],
+    ["vidlink", async (imdbid: string) => await scrapeVidLink(imdbid, '0', '0', 1)],
+    ["vidsrc", async (imdbid: string) => await scrapeVidSrc(imdbid, '0', '0', 1)],
     ["wecima", async (id: string) => await scrapeWecima(id)],
     ["akwam", async (id: string) => await scrapeAkwam(id)],
     //["goquick", async (imdbid: string) => await scrapeGoquick(imdbid, 0, 0)],
@@ -56,6 +60,8 @@ const series = new Map<string, (imdbid: string, season: string, episode: string,
     ["visioncine", async (id) => await scrapeVisioncine(id)],
     ["akwam", async (id: string) => await scrapeAkwam(id)],
     //["smashystream", async (imdbid: string, season: string, episode: string) => await scrapeSmashystreamOrg(imdbid, season, episode, 1)],
+    ["vidlink", async (imdbid: string, season: string, episode: string) => await scrapeVidLink(imdbid, season, episode, 1)],
+    ["vidsrc", async (imdbid: string, season: string, episode: string) => await scrapeVidSrc(imdbid, season, episode, 1)],
     //["goquick", async (imdbid: string, season: string, episode: string) => await scrapeGoquick(imdbid, season, episode)],
 ]);
 
@@ -70,6 +76,8 @@ const info = new Map<string, any>([
     ["guardahd", {name: "GuardaHD", lang_emoji: "🇮🇹"}],
     //["smashystreamtr", {name: "Smashystream TR", lang_emoji: "🇹🇷"}],
     //["smashystreamhi", {name: "Smashystream HI", lang_emoji: "🇮🇳"}],
+    ["vidlink", {name: "vidlink", lang_emoji: "🎥 🖥️"}],
+    ["vidsrc", {name: "vidsrc", lang_emoji: "🎥 🖥️"}],
     ["visioncine", {name: "Visioncine (Catalog Resolver)", lang_emoji: "🇧🇷"}],
     ["wecima", {name: "WeCima (Catalog Resolver)", lang_emoji: "🇸🇦"}],
     ["akwam", {name: "Akwam (Catalog Resolver)", lang_emoji: "🇸🇦"}],
@@ -171,6 +179,8 @@ export async function buildHTMLselectors() {
     });
     return (`
         <h3>Configure</h3>
+        <p>Any provider noted with 🖥️ uses a real Chrome browser to scrape.
+        Browser scraping must be enabled in .env to use these providers.</p>
         <form id="language-form">
         ${selector}
     </form>`)
