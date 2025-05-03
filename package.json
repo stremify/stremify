@@ -11,14 +11,15 @@
   },
   "dependencies": {
     "@consumet/extensions": "^1.7.0",
-    "@movie-web/providers": "github:sussy-code/providers",
+    "@movie-web/providers": "^2.4.13",
     "@types/stremio-addon-sdk": "^1.6.11",
-    "cheerio": "1.0.0-rc.12",
+    "cheerio": "^1.0.0",
     "dotenv": "^16.4.5",
     "m3u8-parser": "^7.1.0",
     "nitro-cors": "^0.7.1",
     "node-ts-cache": "^4.4.0",
     "node-ts-cache-storage-memory": "^4.4.0",
     "vm2": "^3.9.19"
-  }
+  },
+  "packageManager": "pnpm@7.33.5+sha512.4e499f22fffe5845aa8f9463e1386b2d72c3134e0ebef9409360ad844fef0290e82b479b32eb2ec0f30e56607e1820c22167829fd62656d41a8fd0cc4a0f4267"
 }
