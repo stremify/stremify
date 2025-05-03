@@ -31,14 +31,29 @@ export async function scrapeKinokiste(imdb, season, episode) {
 
           const episodeData = await episodeFetch.text()
 
-          /*if (remote != "true") {
-            const droploadregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a href="([^"]+)">Dropload</a>`);
-
-            const droploadmatch = droploadregex.exec(episodeData);
-  
-            if (droploadmatch != null) {
-              const url = await evalResolver(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1e/$2'))); // replace adds an /e/ to the url so that we can scrape
+          const linksmatch = episodeData.match(`${season}x${episode} Episode ${episode} –.*`);
+          if (linksmatch) {
+            const supervideomatch = linksmatch[0].match(`<a target="_blank" href="([^"]+)">Supervideo</a>`);
+            if (supervideomatch) {
+              const url = await evalResolver(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
               finalstreams.push(
+                  {
+                      name: "Stremify DE",
+                      type: "url",
+                      url: url,
+                      title: `Kinokiste - auto (supervideo.cc)`,
+                      behaviorHints: {
+                        bingeGroup: `de_supervideo`
+                      }
+                  }
+              )
+            }
+
+            if (remote != "true") {
+              const droploadmatch = linksmatch[0].match(`<a href="([^"]+)">Dropload</a>`);
+              if (droploadmatch) {
+                const url = await evalResolver(new URL(droploadmatch[1].replace(/(.io\/)(.*)/, '$1embed-$2.html'))) // gives us an embed
+                finalstreams.push(
                   {
                       name: "Stremify DE",
                       type: "url",
@@ -48,27 +63,10 @@ export async function scrapeKinokiste(imdb, season, episode) {
                         bingeGroup: `de_dropload`
                       }
                   }
-              )
+                )
+              }
             }
-          }*/
 
-          const supervideoregex = new RegExp(`${season}x${episode} Episode ${episode} –.*?<a target="_blank" href="([^"]+)">Supervideo</a>`);
-
-          const supervideomatch = supervideoregex.exec(episodeData);
-          if (supervideomatch != null) {
-            const url = await evalResolver(new URL(supervideomatch[1].replace(/(.tv\/)(.*)/, '$1e/$2').replace(".html", ""))) // gives us an embed
-            
-            finalstreams.push(
-                {
-                    name: "Stremify DE",
-                    type: "url",
-                    url: url,
-                    title: `Kinokiste - auto (supervideo.cc)`,
-                    behaviorHints: {
-                      bingeGroup: `de_supervideo`
-                    }
-                }
-            )
           }
 
           return(finalstreams)
