@@ -29,16 +29,16 @@ export async function scrapeMeinecloud(imdbid) {
       let match;
       
       if (remote != "true") {
-        /*while ((match = droploadregex.exec(text)) !== null) {
-          const embedurl = `https://${match[0]}`        
+        while ((match = droploadregex.exec(text)) !== null) {
+          const embedurl = `https://${match[0]}`
           const url = await evalResolver(new URL(embedurl))
-              finalstreams.push({
-                  name: "Stremify DE",
-                  type: "url",
-                  url: url,
-                  title: `Meinecloud - auto (dropload.io)`
-              })
-        }*/
+          finalstreams.push({
+              name: "Stremify DE",
+              type: "url",
+              url: url,
+              title: `Meinecloud - auto (dropload.io)`
+          })
+        }
     
         while ((match = streamtaperegex.exec(text)) !== null) {
           const initialurl = await streamtapeResolve(match[0])
@@ -53,14 +53,14 @@ export async function scrapeMeinecloud(imdbid) {
       }
 
       while ((match = supervideoregex.exec(text)) !== null) {
-        const embedurl = `https://${match[0]}`        
+        const embedurl = `https://${match[0]}`
         const url = await evalResolver(new URL(embedurl))
-            finalstreams.push({
-                name: "Stremify DE",
-                type: "url",
-                url: url,
-                title: `Meinecloud - auto (supervideo.cc)`
-            })
+        finalstreams.push({
+            name: "Stremify DE",
+            type: "url",
+            url: url,
+            title: `Meinecloud - auto (supervideo.cc)`
+        })
       }
 
       return(finalstreams)
