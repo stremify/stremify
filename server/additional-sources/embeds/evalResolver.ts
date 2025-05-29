@@ -2,7 +2,7 @@
 // used for the common eval packed method
 
 import { VM } from "vm2";
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 export async function evalResolver(link: URL) {
     const response = await fetch(link, {

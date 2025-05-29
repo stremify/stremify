@@ -28,7 +28,7 @@
  * SOFTWARE.
  */
 
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 
 export async function streamtapeResolve(link: URL) {
     try {
